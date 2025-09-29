@@ -1,0 +1,242 @@
+@import '/Burger/burger.css';
+@import 'vars.css';
+@import 'grid.css';
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+html, body {
+	height: 100%;
+	background-color: rgb(55, 25, 77);
+	color: var(--white-color);
+}
+
+@font-face {
+	font-family: Jura;
+	src: url(/Fonts/Jura-VariableFont_wght.ttf);
+}
+
+@font-face {
+	font-family: Jura;
+	src: url(/Fonts/Jura-VariableFont_wght.ttf);
+		font-weight: 700;
+}
+
+@font-face {
+	font-family: Tektur;
+	src: url(/Fonts/Tektur-VariableFont_wdth\,wght.ttf);
+}
+
+@font-face {
+	font-family: Tektur;
+	src: url(/Fonts/Tektur-VariableFont_wdth\,wght.ttf);
+		font-weight: 900;
+}
+
+body {
+	font-size: 18px;
+	font-family: Tektur, Jura, sans-serif;
+}
+
+.slider {
+	height: 100%;
+}
+
+.slider__layer {
+	position: absolute;
+	inset: 0;
+	background-size: cover;
+	background-position: center;
+	will-change: transform;
+}
+
+.slider__item {
+	overflow: hidden;
+	transform: scale(1.25)!important;
+	transition: 2s ease!important;
+}
+
+.slider__item:not(.swiper-slide-active) {
+	transform: scale(1)!important;
+}
+
+.slider-ui {
+	position: absolute;
+	z-index: 10;
+	inset: 0;
+}
+
+.top-line {
+	padding: 3.2em 0;
+}
+
+.logo {
+	display: block;
+}
+
+.logo img {
+	display: block;
+	width: 15.5em;
+}
+
+.main-menu li {
+	list-style-type: none;
+	display: inline-block;
+}
+
+.main-menu li > * {
+	color: var(--gray-color);
+	text-transform: uppercase;
+	font-weight: 600;
+	text-decoration: none;
+	font-size: .925em;
+	letter-spacing: .21em;
+	position: relative;
+}
+
+.main-menu li > *::before,
+.main-menu li > *::after {
+	content: '';
+	display: inline-block;
+	height: 2px;
+	background-color: var(--purple-color);
+	width: 12px;
+	vertical-align: middle;
+	top: -1px;
+	left: -1.5px;
+	position: relative;
+	border-radius: 10em;
+	margin: 0 7.25px;
+	visibility: hidden;
+}
+
+.main-menu li.active > *,
+.main-menu li:hover > * {
+	color: var(--white-color);
+}
+
+.main-menu li.active > *::before,
+.main-menu li:hover > *::before,
+.main-menu li.active > *::after,
+.main-menu li:hover > *::after {
+	visibility: visible;
+}
+
+.button {
+	padding: 1.05em 2.6em;
+	color: var(--white-color);
+	background-color: var(--purple-color);
+	border: 1.5px solid transparent;
+	border-radius: 10em 0 10em;
+	font-weight: 500;
+	text-decoration: none;
+	letter-spacing: .21em;
+	text-transform: uppercase;
+	font-size: .65em;
+	cursor: pointer;
+}
+
+.button--top {
+	background-color: transparent;
+	border-color: var(--purple-color);
+	margin: 0 2em 0 3em;
+}
+
+.button--main {
+	margin-top: 3em;
+	padding: 2em 4em;
+}
+
+.button:hover {
+	background-color: var(--purple-color);
+}
+
+.header-wrapper {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+}
+
+.header-content {
+	flex: 1;
+	text-align: center;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	line-height: 1;
+	flex-direction: column;
+}
+
+.header-content__slide {
+	position: absolute;
+}
+
+.header-content h1 {
+	font-size: calc(var(--index) * 4.5);
+	text-transform: uppercase;
+	font-weight: 900;
+}
+
+.header-content p {
+	max-width: 560px;
+	font-weight: 500;
+	line-height: 1.4;
+	display: inline-block;
+}
+
+.header-bottom {
+	min-height: 120px;
+}
+
+.letters .letter {
+	text-shadow: 25px 0 35px rgba(0 0 0 / .7);
+	position: relative;
+	margin-left: calc(var(--index) * -.25);
+	margin-right: calc(var(--index) * -.25);
+	opacity: 0;
+	top: -5em;
+	transition: opacity var(--transition), top var(--transition);
+}
+
+.header-content__slide.active .letter {
+	opacity: 1;
+	top: 0;
+}
+.header-content__slide.active + * .letter {
+	top: 5em;
+}
+
+.header-content__info {
+	top: -18em;
+	position: relative;
+	opacity: 0;
+	transition: opacity 1s ease, top 1.25s ease;
+}
+
+.header-content__slide.active .header-content__info {
+	opacity: 1;
+	top: 0;
+}
+
+.header-content__slide:has(* + .active .header-content__info),
+.header-content__slide.active + * .active .header-content__info {
+	top: 18em;
+}
+
+.slider-ui {
+	pointer-events: none;
+}
+
+.logo, .main-menu, .button, .hamburger-menu {
+	pointer-events: auto;
+}
+
+.info-right {
+  text-align: right;
+  max-width: 560px;
+  margin-left: auto;
+  margin-right: 0;
+}
