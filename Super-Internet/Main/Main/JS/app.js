@@ -32,3 +32,16 @@ swiper.on('slideChange', function() {
 		swiper.activeIndex === i ? li.classList.add('active') : li.classList.remove('active');
 	});
 })
+
+// --- Обробник натискання кнопки "Підключитися зараз" ---
+
+const connectButtons = document.querySelectorAll('.button--main');
+const targetURL = '/PersonalAccount/personalAccount.html';
+
+connectButtons.forEach(button => {
+	button.addEventListener('click', (event) => {
+	event.preventDefault();
+	
+	window.location.href = targetURL;
+	});
+});

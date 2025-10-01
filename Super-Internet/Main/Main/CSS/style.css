@@ -1,4 +1,4 @@
-@import '/Main/Burger/burger.css';
+@import '/Main/Main/Burger/burger.css';
 @import 'vars.css';
 @import 'grid.css';
 
@@ -16,23 +16,23 @@ html, body {
 
 @font-face {
 	font-family: Jura;
-	src: url(/Fonts/Jura-VariableFont_wght.ttf);
+	src: url(/Main/Fonts/Jura-VariableFont_wght.ttf);
 }
 
 @font-face {
 	font-family: Jura;
-	src: url(/Fonts/Jura-VariableFont_wght.ttf);
+	src: url(/Main/Fonts/Jura-VariableFont_wght.ttf);
 		font-weight: 700;
 }
 
 @font-face {
 	font-family: Tektur;
-	src: url(/Fonts/Tektur-VariableFont_wdth\,wght.ttf);
+	src: url(/Main/Fonts/Tektur-VariableFont_wdth\,wght.ttf);
 }
 
 @font-face {
 	font-family: Tektur;
-	src: url(/Fonts/Tektur-VariableFont_wdth\,wght.ttf);
+	src: url(/Main/Fonts/Tektur-VariableFont_wdth\,wght.ttf);
 		font-weight: 900;
 }
 
