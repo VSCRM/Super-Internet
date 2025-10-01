@@ -71,7 +71,7 @@ class ValidationService {
 	static validateFIO(fio) {
 		const words = fio.trim().split(/\s+/);
 		if (words.length !== 3) return false;
-		
+
 		const ukrainianRegex = /^[А-ЯІЇЄҐ][а-яіїєґ']+$/;
 		return words.every(word => ukrainianRegex.test(word));
 	}
@@ -175,9 +175,9 @@ class ModalService {
 			</div>
 		`;
 		document.body.appendChild(modal);
-		
+
 		setTimeout(() => modal.classList.add('show'), 10);
-		
+
 		modal.querySelector('.modal-btn').addEventListener('click', () => {
 			modal.classList.remove('show');
 			setTimeout(() => modal.remove(), 300);
@@ -200,25 +200,25 @@ class ModalService {
 				</div>
 			`;
 			document.body.appendChild(modal);
-			
+
 			setTimeout(() => modal.classList.add('show'), 10);
-			
+
 			const input = modal.querySelector('.modal-input');
 			input.focus();
-			
+
 			modal.querySelector('.cancel').addEventListener('click', () => {
 				modal.classList.remove('show');
 				setTimeout(() => modal.remove(), 300);
 				resolve(null);
 			});
-			
+
 			const confirm = () => {
 				const value = input.value.trim();
 				modal.classList.remove('show');
 				setTimeout(() => modal.remove(), 300);
 				resolve(value);
 			};
-			
+
 			modal.querySelector('.confirm').addEventListener('click', confirm);
 			input.addEventListener('keypress', (e) => {
 				if (e.key === 'Enter') confirm();
@@ -241,15 +241,15 @@ class ModalService {
 				</div>
 			`;
 			document.body.appendChild(modal);
-			
+
 			setTimeout(() => modal.classList.add('show'), 10);
-			
+
 			modal.querySelector('.cancel').addEventListener('click', () => {
 				modal.classList.remove('show');
 				setTimeout(() => modal.remove(), 300);
 				resolve(false);
 			});
-			
+
 			modal.querySelector('.confirm').addEventListener('click', () => {
 				modal.classList.remove('show');
 				setTimeout(() => modal.remove(), 300);
@@ -408,7 +408,7 @@ class UIController {
 
 	async selectService(serviceType) {
 		const client = this.authService.currentUser;
-		
+
 		const address = await ModalService.prompt(
 			'Адреса підключення',
 			'Введіть вашу повну адресу (вулиця, номер будинку, квартира):',
@@ -424,13 +424,13 @@ class UIController {
 
 		client.createContract(serviceType, address);
 		this.authService.saveUsers();
-		
+
 		await ModalService.show(
 			'Заявка прийнята',
 			`Послугу успішно обрано!\n\nВаша адреса: ${address}\n\nОчікуйте підтвердження підключення від адміністратора. Після підключення кабелю від вул. Січових Стрільців, 15 до вашої адреси та перевірки даних, ви зможете активувати послугу.`,
 			'success'
 		);
-		
+
 		this.showClientDashboard(client);
 	}
 
@@ -444,7 +444,7 @@ class UIController {
 		document.getElementById('balance').textContent = client.balance.toFixed(2) + ' грн';
 
 		const statusBadge = document.getElementById('serviceStatusBadge');
-		
+
 		if (!client.connectionApproved) {
 			statusBadge.innerHTML = '<span class="status-badge status-pending">Очікує підключення</span>';
 		} else if (client.balance >= 0) {
@@ -472,7 +472,7 @@ class UIController {
 			};
 			document.getElementById('contractService').textContent = serviceNames[client.contract.serviceType];
 			document.getElementById('contractEquipment').textContent = client.contract.equipmentId;
-			
+
 			let statusText = '';
 			if (!client.connectionApproved) {
 				statusText = '<span class="status-badge status-pending">Очікує підключення</span>';
@@ -528,7 +528,7 @@ class UIController {
 
 	openSupportChat(client) {
 		this.currentChatClient = client;
-		
+
 		const chatOverlay = document.createElement('div');
 		chatOverlay.className = 'chat-overlay';
 		chatOverlay.innerHTML = `
@@ -538,10 +538,11 @@ class UIController {
 						<h3>${client.fio}</h3>
 						<p style="font-size: 0.9rem; opacity: 0.8;">${client.email}</p>
 					</div>
-					<div style="display: flex; gap: 1rem;">
-						<button class="view-client-btn">Переглянути профіль</button>
-						<button class="close-chat-btn">✕</button>
-					</div>
+						<div style="display: flex; gap: 1rem;">
+							<button class="view-client-btn">Переглянути профіль</button>
+							<button class="close-ticket-btn">Закрити звернення</button>
+							<button class="close-chat-btn">✕</button>
+						</div>
 				</div>
 				<div class="chat-messages-area" id="supportChatMessages"></div>
 				<div class="chat-input">
@@ -550,24 +551,42 @@ class UIController {
 				</div>
 			</div>
 		`;
-		
+
 		document.body.appendChild(chatOverlay);
 		setTimeout(() => chatOverlay.classList.add('show'), 10);
-		
+
 		this.loadChatMessages(client);
-		
+
 		chatOverlay.querySelector('.close-chat-btn').addEventListener('click', () => {
 			chatOverlay.classList.remove('show');
 			setTimeout(() => chatOverlay.remove(), 300);
 		});
-		
+
 		chatOverlay.querySelector('.view-client-btn').addEventListener('click', () => {
 			this.showClientProfile(client);
 		});
-		
+
+		chatOverlay.querySelector('.close-ticket-btn').addEventListener('click', async () => {
+			const confirmed = await ModalService.confirm(
+				'Закриття звернення',
+				`Закрити звернення від ${client.fio}? Всі повідомлення будуть видалені.`
+			);
+
+			if (confirmed) {
+				client.messages = [];
+				this.authService.updateUser(client);
+				ModalService.show('Успіх', 'Звернення закрито!', 'success');
+				chatOverlay.classList.remove('show');
+				setTimeout(() => {
+					chatOverlay.remove();
+					this.loadTickets();
+				}, 300);
+			}
+		});
+
 		const sendBtn = chatOverlay.querySelector('#supportSendBtn');
 		const input = chatOverlay.querySelector('#supportMessageInput');
-		
+
 		sendBtn.addEventListener('click', () => this.sendSupportMessage(client));
 		input.addEventListener('keypress', (e) => {
 			if (e.key === 'Enter') sendBtn.click();
@@ -577,12 +596,12 @@ class UIController {
 	loadChatMessages(client) {
 		const container = document.getElementById('supportChatMessages');
 		container.innerHTML = '';
-		
+
 		if (!client.messages || client.messages.length === 0) {
 			container.innerHTML = '<p style="text-align: center; color: var(--gray-color);">Поки що немає повідомлень</p>';
 			return;
 		}
-		
+
 		client.messages.forEach(msg => {
 			const msgDiv = document.createElement('div');
 			msgDiv.className = `message ${msg.from === client.email ? 'user' : 'support'}`;
@@ -592,16 +611,16 @@ class UIController {
 			`;
 			container.appendChild(msgDiv);
 		});
-		
+
 		container.scrollTop = container.scrollHeight;
 	}
 
 	sendSupportMessage(client) {
 		const input = document.getElementById('supportMessageInput');
 		const message = input.value.trim();
-		
+
 		if (!message) return;
-		
+
 		const msg = {
 			from: 'support',
 			to: client.email,
@@ -609,11 +628,11 @@ class UIController {
 			timestamp: new Date(),
 			read: false
 		};
-		
+
 		if (!client.messages) client.messages = [];
 		client.messages.push(msg);
 		this.authService.updateUser(client);
-		
+
 		input.value = '';
 		this.loadChatMessages(client);
 	}
@@ -687,26 +706,26 @@ class UIController {
 				</div>
 			</div>
 		`;
-		
+
 		document.body.appendChild(profileOverlay);
 		setTimeout(() => profileOverlay.classList.add('show'), 10);
-		
+
 		profileOverlay.querySelector('.close-modal-btn').addEventListener('click', () => {
 			profileOverlay.classList.remove('show');
 			setTimeout(() => profileOverlay.remove(), 300);
 		});
-		
+
 		profileOverlay.querySelectorAll('.profile-tab').forEach(tab => {
 			tab.addEventListener('click', (e) => {
 				profileOverlay.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('active'));
 				profileOverlay.querySelectorAll('.profile-tab-content').forEach(c => c.classList.remove('active'));
-				
+
 				e.target.classList.add('active');
 				const tabName = e.target.dataset.tab;
 				profileOverlay.querySelector(`#profile${tabName.charAt(0).toUpperCase() + tabName.slice(1)}Tab`).classList.add('active');
 			});
 		});
-		
+
 		const saveBtn = profileOverlay.querySelector('#saveContractBtn');
 		if (saveBtn) {
 			saveBtn.addEventListener('click', async () => {
@@ -715,7 +734,7 @@ class UIController {
 				client.contract.email = profileOverlay.querySelector('#editEmail').value;
 				client.contract.address = profileOverlay.querySelector('#editAddress').value;
 				client.contract.equipmentId = profileOverlay.querySelector('#editEquipment').value;
-				
+
 				this.authService.updateUser(client);
 				await ModalService.show('Успіх', 'Договір оновлено!', 'success');
 				profileOverlay.classList.remove('show');
@@ -819,17 +838,29 @@ class UIController {
 		}
 
 		clients.forEach(client => {
-			const status = client.connectionApproved ? (Math.random() > 0.2 ? 'online' : 'offline') : 'pending';
+			if (!client.equipmentStatus) {
+				client.equipmentStatus = client.connectionApproved ? 'online' : 'pending';
+			}
+
+			const status = client.equipmentStatus;
 			const item = document.createElement('div');
 			item.className = `equipment-item ${status}`;
 			item.innerHTML = `
-                <strong>${client.contract.equipmentId}</strong><br>
-                <small>${client.fio}</small><br>
-                <span class="status-badge ${status === 'online' ? 'status-active' : status === 'offline' ? 'status-debt' : 'status-pending'}" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; margin-top: 0.5rem; display: inline-block;">
-                    ${status === 'online' ? 'Онлайн' : status === 'offline' ? 'Офлайн' : 'Очікує'}
-                </span>
-                ${!client.connectionApproved ? '<button class="approve-btn" data-id="' + client.id + '" style="margin-top: 0.5rem; width: 100%; padding: 0.5rem; background: var(--success-color); border: none; border-radius: 5px; cursor: pointer; color: white;">Підтвердити</button>' : ''}
-            `;
+				<strong>${client.contract.equipmentId}</strong><br>
+				<small>${client.fio}</small><br>
+				<span class="status-badge ${status === 'online' ? 'status-active' : status === 'offline' ? 'status-debt' : 'status-pending'}" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; margin-top: 0.5rem; display: inline-block;">
+					${status === 'online' ? 'Онлайн' : status === 'offline' ? 'Офлайн' : 'Очікує'}
+				</span>
+				<div class="equipment-actions">
+					${!client.connectionApproved ?
+					'<button class="approve-btn" data-id="' + client.id + '">Підтвердити</button>'
+					: ''}
+					${client.connectionApproved ? `
+						${status !== 'online' ? '<button class="status-control-btn set-online" data-id="' + client.id + '">Увімкнути</button>' : ''}
+						${status !== 'offline' ? '<button class="status-control-btn set-offline" data-id="' + client.id + '">Вимкнути</button>' : ''}
+					` : ''}
+				</div>
+			`;
 			item.title = `Клієнт: ${client.fio}\nАдреса: ${client.contract.address}\nПослуга: ${client.contract.serviceType}\nСтатус: ${status}`;
 			equipmentGrid.appendChild(item);
 		});
@@ -839,18 +870,46 @@ class UIController {
 				e.stopPropagation();
 				const clientId = parseFloat(btn.dataset.id);
 				const client = this.authService.getUserById(clientId);
-				
+
 				if (client) {
 					const confirmed = await ModalService.confirm(
 						'Підтвердження підключення',
 						`Підтвердити підключення для ${client.fio}?\n\nАдреса: ${client.contract.address}\nПослуга: ${client.contract.serviceType === 'internet' ? 'Інтернет' : 'Інтернет + ТБ'}`
 					);
-					
+
 					if (confirmed) {
 						client.connectionApproved = true;
 						client.contract.status = 'active';
 						this.authService.updateUser(client);
 						ModalService.show('Успіх', 'Підключення підтверджено! Клієнт може активувати послугу після оплати.', 'success');
+						this.loadEquipment();
+					}
+				}
+			});
+		});
+
+		document.querySelectorAll('.status-control-btn').forEach(btn => {
+			btn.addEventListener('click', async (e) => {
+				e.stopPropagation();
+				const clientId = parseFloat(btn.dataset.id);
+				const client = this.authService.getUserById(clientId);
+				const newStatus = btn.classList.contains('set-online') ? 'online' : 'offline';
+
+				if (client) {
+					const statusText = newStatus === 'online' ? 'увімкнути' : 'вимкнути';
+					const confirmed = await ModalService.confirm(
+						'Зміна статусу обладнання',
+						`${statusText.charAt(0).toUpperCase() + statusText.slice(1)} обладнання ${client.contract.equipmentId}?\n\nКлієнт: ${client.fio}`
+					);
+
+					if (confirmed) {
+						client.equipmentStatus = newStatus;
+						this.authService.updateUser(client);
+						ModalService.show(
+							'Успіх',
+							`Обладнання ${newStatus === 'online' ? 'увімкнено' : 'вимкнено'}!`,
+							'success'
+						);
 						this.loadEquipment();
 					}
 				}
@@ -945,14 +1004,14 @@ const messageService = new MessageService(authService);
 // Payment button handler
 document.getElementById('payBtn').addEventListener('click', async () => {
 	const client = authService.currentUser;
-	
+
 	if (!client.connectionApproved) {
 		ModalService.show('Увага', 'Очікуйте підтвердження підключення від адміністратора. Оплата буде доступна після активації.', 'warning');
 		return;
 	}
-	
+
 	const amount = await ModalService.prompt('Оплата', 'Введіть суму для оплати (грн):', '300');
-	
+
 	if (amount && !isNaN(amount) && parseFloat(amount) > 0) {
 		billingService.makePayment(client, parseFloat(amount));
 		uiController.updateServiceStatus(client);

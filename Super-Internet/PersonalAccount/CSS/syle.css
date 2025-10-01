@@ -723,6 +723,23 @@ body {
 	transform: translateY(-2px);
 }
 
+.close-ticket-btn {
+	padding: 0.6rem 1.2rem;
+	background: var(--success-color);
+	border: none;
+	border-radius: 8px;
+	color: white;
+	font-family: Tektur, sans-serif;
+	cursor: pointer;
+	transition: all 0.3s;
+	font-size: 0.9rem;
+}
+
+.close-ticket-btn:hover {
+	background: #40bf5a;
+	transform: translateY(-2px);
+}
+
 .chat-messages-area {
 	flex: 1;
 	overflow-y: auto;
@@ -862,6 +879,47 @@ body {
 	background: #40bf5a;
 	transform: translateY(-2px);
 	box-shadow: 0 3px 10px rgba(81, 207, 102, 0.4);
+}
+
+.status-control-btn {
+	margin-top: 0.5rem;
+	width: 100%;
+	padding: 0.5rem;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	color: white;
+	font-family: Tektur, sans-serif;
+	transition: all 0.3s;
+	text-transform: uppercase;
+	font-size: 0.8rem;
+}
+
+.status-control-btn.set-online {
+	background: var(--success-color);
+}
+
+.status-control-btn.set-online:hover {
+	background: #40bf5a;
+	transform: translateY(-2px);
+	box-shadow: 0 3px 10px rgba(81, 207, 102, 0.4);
+}
+
+.status-control-btn.set-offline {
+	background: var(--error-color);
+}
+
+.status-control-btn.set-offline:hover {
+	background: #ff5252;
+	transform: translateY(-2px);
+	box-shadow: 0 3px 10px rgba(255, 107, 107, 0.4);
+}
+
+.equipment-actions {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	margin-top: 0.5rem;
 }
 
 /* Responsive */
