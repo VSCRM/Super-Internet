@@ -5,6 +5,7 @@
 		cursor: pointer;
 		z-index: 101;
 		position: relative;
+		left: -20px;
 		display: none;
 		align-items: center;
 		justify-content: center;
