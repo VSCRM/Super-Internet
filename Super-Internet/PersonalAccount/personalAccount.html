@@ -4,16 +4,25 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-		<link rel="stylesheet" href="/PersonalAccount/CSS/syle.css">
-		<script src="/PersonalAccount/JS/app.js" defer></script>
-		
+		<link
+			rel="stylesheet"
+			href="/Super-Internet/PersonalAccount/Personal/style.css"
+		/>
+		<script
+			type="module"
+			src="/Super-Internet/PersonalAccount/Personal/main.js"
+			defer
+		></script>
+
 		<title>Авторизація - Super Internet</title>
 	</head>
 	<body>
-		<!-- Auth Container -->
 		<div id="authContainer" class="auth-container">
 			<div class="logo">
-				<img src="/Main/img/Logo/Logo.png" alt="Super Internet" />
+				<img
+					src="/Super-Internet/Main/img/Logo/Logo.png"
+					alt="Super Internet"
+				/>
 			</div>
 
 			<div class="tab-buttons">
@@ -21,7 +30,6 @@
 				<button class="tab-btn" data-tab="register">Реєстрація</button>
 			</div>
 
-			<!-- Login Form -->
 			<form id="loginForm" class="auth-form active">
 				<div class="form-group">
 					<label for="loginEmail">Email</label>
@@ -35,10 +43,18 @@
 						>Пароль має містити мінімум 6 символів</span
 					>
 				</div>
+				<button
+					type="button"
+					class="link-btn"
+					id="forgotPasswordBtn"
+					style="margin-top: 1rem"
+				>
+					Забув пароль
+				</button>
+
 				<button type="submit" class="submit-btn">Увійти</button>
 			</form>
 
-			<!-- Register Form -->
 			<form id="registerForm" class="auth-form">
 				<div class="form-group">
 					<label for="regEmail">Email</label>
@@ -76,7 +92,6 @@
 			</form>
 		</div>
 
-		<!-- Dashboard -->
 		<div id="dashboard" class="dashboard hidden">
 			<div class="dashboard-header">
 				<div class="user-info">
@@ -127,6 +142,15 @@
 							<span>Наступний платіж:</span>
 							<span id="nextPayment"></span>
 						</div>
+
+						<div style="margin-top: 1.5rem">
+							<h4>Регулярний платіж</h4>
+							<div
+								id="recurringPaymentToggle"
+								style="display: flex; align-items: center; margin-top: 0.5rem"
+							></div>
+						</div>
+
 						<button class="submit-btn" id="payBtn">Оплатити</button>
 					</div>
 				</div>
