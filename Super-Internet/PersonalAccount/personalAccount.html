@@ -4,13 +4,9 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-		<link
-			rel="stylesheet"
-			href="/Super-Internet/PersonalAccount/Personal/style.css"
-		/>
+		<link rel="stylesheet" href="/PersonalAccount/CSS/syle.css" />
 		<script
-			type="module"
-			src="/Super-Internet/PersonalAccount/Personal/main.js"
+			src="/PersonalAccount/JS/app.js"
 			defer
 		></script>
 
@@ -20,7 +16,7 @@
 		<div id="authContainer" class="auth-container">
 			<div class="logo">
 				<img
-					src="/Super-Internet/Main/img/Logo/Logo.png"
+					src="/Main/img/Logo/Logo.png"
 					alt="Super Internet"
 				/>
 			</div>
@@ -60,7 +56,7 @@
 					<label for="regEmail">Email</label>
 					<input type="email" id="regEmail" required />
 					<span class="error-message"
-						>Email має закінчуватися на @gmail.com, @ua або подібне</span
+						>Email має закінчуватись на @gmail.com, @ua або подібне</span
 					>
 				</div>
 				<div class="form-group">
@@ -189,6 +185,8 @@
 							<span id="contractStatus"></span>
 						</div>
 					</div>
+
+					<div id="contractActions" style="text-align: center"></div>
 				</div>
 
 				<div id="supportContent" class="tab-content">
@@ -230,6 +228,7 @@
 				<div class="nav-tabs">
 					<button class="nav-tab active" data-content="staff">Персонал</button>
 					<button class="nav-tab" data-content="equipment">Обладнання</button>
+					<button class="nav-tab" data-content="clients">Клієнти</button>
 				</div>
 
 				<div id="staffContent" class="tab-content active">
@@ -246,6 +245,13 @@
 					<div class="service-card">
 						<h3>Моніторинг обладнання</h3>
 						<div class="equipment-grid" id="equipmentGrid"></div>
+					</div>
+				</div>
+
+				<div id="clientsContent" class="tab-content">
+					<div class="service-card">
+						<h3>Управління клієнтами</h3>
+						<div class="tickets-grid" id="clientsListGrid"></div>
 					</div>
 				</div>
 			</div>

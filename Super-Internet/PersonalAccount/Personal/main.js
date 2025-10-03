@@ -18,6 +18,7 @@ class Client extends User {
 		this.messages = [];
 		this.lastPaymentDate = new Date();
 		this.connectionApproved = false;
+		this.unreadMessages = 0;
 	}
 
 	createContract(serviceType, address) {
@@ -77,8 +78,23 @@ class ValidationService {
 	}
 
 	static validateAddress(address) {
+		const trimmed = address.trim();
+		// Перевіряємо мінімальну довжину
+		if (trimmed.length < 15) return false;
+
+		// Перевіряємо наявність українських букв
 		const ukrainianRegex = /[а-яіїєґА-ЯІЇЄҐ]/;
-		return address.trim().length >= 10 && ukrainianRegex.test(address);
+		if (!ukrainianRegex.test(trimmed)) return false;
+
+		// Перевіряємо наявність цифр (номер будинку)
+		const hasNumbers = /\d/.test(trimmed);
+		if (!hasNumbers) return false;
+
+		// Перевіряємо наявність ключових слів (вул., вулиця, пров., проспект тощо)
+		const streetKeywords = /(вул\.?|вулиця|пров\.?|провулок|просп\.?|проспект|бульв\.?|бульвар|площа|майдан)/i;
+		if (!streetKeywords.test(trimmed)) return false;
+
+		return true;
 	}
 }
 
@@ -162,16 +178,17 @@ class AuthService {
 		return this.users.find(u => u.id === id);
 	}
 
-	// -----------------------------------------------------------
-	// Методи для відновлення паролю
-	// -----------------------------------------------------------
+	deleteUser(userId) {
+		this.users = this.users.filter(u => u.id !== userId);
+		this.saveUsers();
+	}
+
 	getTempCode(email) {
 		const user = this.users.find(u => u.email === email);
 		if (!user) {
 			throw new Error('Користувача з таким email не знайдено');
 		}
 
-		// Імітація генерації та відправки коду
 		const code = Math.floor(100000 + Math.random() * 900000).toString();
 		user.tempCode = code;
 		user.codeExpiry = Date.now() + 5 * 60 * 1000;
@@ -328,8 +345,25 @@ class UIController {
 		});
 
 		document.getElementById('forgotPasswordBtn').addEventListener('click', () => this.handleForgotPassword());
-	}
 
+		// Real-time validation
+		const regEmail = document.getElementById('regEmail');
+		const regPhone = document.getElementById('regPhone');
+		const regFIO = document.getElementById('regFIO');
+		const regPassword = document.getElementById('regPassword');
+		const regPasswordConfirm = document.getElementById('regPasswordConfirm');
+
+		regEmail.addEventListener('input', () => this.validateInput(regEmail, ValidationService.validateEmail));
+		regPhone.addEventListener('input', () => this.validateInput(regPhone, ValidationService.validatePhone));
+		regFIO.addEventListener('input', () => this.validateInput(regFIO, ValidationService.validateFIO));
+		regPassword.addEventListener('input', () => {
+			this.validateInput(regPassword, ValidationService.validatePassword);
+			if (regPasswordConfirm.value) {
+				this.validatePasswordMatch(regPassword, regPasswordConfirm);
+			}
+		});
+		regPasswordConfirm.addEventListener('input', () => this.validatePasswordMatch(regPassword, regPasswordConfirm));
+	}
 
 	switchAuthTab(tab) {
 		document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -343,14 +377,34 @@ class UIController {
 		const value = input.value;
 		const errorElement = input.nextElementSibling;
 
-		if (!validator(value)) {
+		if (value && !validator(value)) {
 			input.classList.add('error');
 			input.classList.remove('success');
 			errorElement.classList.add('show');
 			return false;
-		} else {
+		} else if (value && validator(value)) {
 			input.classList.remove('error');
 			input.classList.add('success');
+			errorElement.classList.remove('show');
+			return true;
+		} else {
+			input.classList.remove('error', 'success');
+			errorElement.classList.remove('show');
+			return false;
+		}
+	}
+
+	validatePasswordMatch(password, passwordConfirm) {
+		const errorElement = passwordConfirm.nextElementSibling;
+
+		if (password.value !== passwordConfirm.value) {
+			passwordConfirm.classList.add('error');
+			passwordConfirm.classList.remove('success');
+			errorElement.classList.add('show');
+			return false;
+		} else {
+			passwordConfirm.classList.remove('error');
+			passwordConfirm.classList.add('success');
 			errorElement.classList.remove('show');
 			return true;
 		}
@@ -369,15 +423,7 @@ class UIController {
 		const isPhoneValid = this.validateInput(phone, ValidationService.validatePhone);
 		const isFIOValid = this.validateInput(fio, ValidationService.validateFIO);
 		const isPasswordValid = this.validateInput(password, ValidationService.validatePassword);
-		const isPasswordMatch = password.value === passwordConfirm.value;
-
-		if (!isPasswordMatch) {
-			passwordConfirm.classList.add('error');
-			passwordConfirm.nextElementSibling.classList.add('show');
-		} else {
-			passwordConfirm.classList.remove('error');
-			passwordConfirm.nextElementSibling.classList.remove('show');
-		}
+		const isPasswordMatch = this.validatePasswordMatch(password, passwordConfirm);
 
 		if (isEmailValid && isPhoneValid && isFIOValid && isPasswordValid && isPasswordMatch) {
 			try {
@@ -390,6 +436,22 @@ class UIController {
 				this.authService.currentUser = client;
 				await ModalService.show('Успіх', 'Реєстрацію завершено! Тепер оберіть послугу.', 'success');
 				this.showDashboard();
+
+				email.value = '';
+				phone.value = '';
+				fio.value = '';
+				password.value = '';
+				passwordConfirm.value = '';
+
+
+				[email, phone, fio, password, passwordConfirm].forEach(input => {
+					input.classList.remove('success', 'error');
+
+					const errorElement = input.nextElementSibling;
+					if (errorElement) errorElement.classList.remove('show');
+				});
+
+
 			} catch (error) {
 				ModalService.show('Помилка', error.message, 'error');
 			}
@@ -437,22 +499,6 @@ class UIController {
 		}
 	}
 
-	// showClientDashboard(client) {
-	// 	document.getElementById('clientDashboard').classList.remove('hidden');
-	// 	document.getElementById('supportDashboard').classList.add('hidden');
-	// 	document.getElementById('adminDashboard').classList.add('hidden');
-
-	// 	if (!client.contract) {
-	// 		document.getElementById('serviceSelection').classList.remove('hidden');
-	// 		document.getElementById('serviceStatus').classList.add('hidden');
-	// 	} else {
-	// 		document.getElementById('serviceSelection').classList.add('hidden');
-	// 		document.getElementById('serviceStatus').classList.remove('hidden');
-	// 		this.updateServiceStatus(client);
-	// 	}
-	// 	this.updateContract(client);
-	// }
-
 	showClientDashboard(client) {
 		document.getElementById('clientDashboard').classList.remove('hidden');
 		document.getElementById('supportDashboard').classList.add('hidden');
@@ -465,9 +511,57 @@ class UIController {
 			document.getElementById('serviceSelection').classList.add('hidden');
 			document.getElementById('serviceStatus').classList.remove('hidden');
 			this.updateServiceStatus(client);
-			this.updateRecurringStatus(client); // <-- ДОДАЙТЕ ЦЕЙ РЯДОК
+			this.updateRecurringStatus(client);
 		}
 		this.updateContract(client);
+		this.checkUnreadMessages(client);
+		this.loadClientChatMessages(client);
+	}
+
+	loadClientChatMessages(client) {
+		const chatMessages = document.getElementById('chatMessages');
+		if (!chatMessages) return;
+
+		chatMessages.innerHTML = '';
+
+		if (!client.messages || client.messages.length === 0) {
+			chatMessages.innerHTML = '<p style="text-align: center; color: var(--gray-color);">Поки що немає повідомлень</p>';
+			return;
+		}
+
+		client.messages.forEach(msg => {
+			const msgDiv = document.createElement('div');
+			msgDiv.className = `message ${msg.from === client.email ? 'user' : 'support'}`;
+			msgDiv.innerHTML = `
+				<small>${new Date(msg.timestamp).toLocaleString('uk-UA')}</small><br>
+				${msg.text}
+			`;
+			chatMessages.appendChild(msgDiv);
+		});
+
+		chatMessages.scrollTop = chatMessages.scrollHeight;
+	}
+
+	checkUnreadMessages(client) {
+		if (!client.messages) return;
+
+		const unread = client.messages.filter(m => m.from === 'support' && !m.read).length;
+		client.unreadMessages = unread;
+
+		const supportTab = document.querySelector('[data-content="support"]');
+		if (supportTab) {
+			let badge = supportTab.querySelector('.unread-badge');
+			if (unread > 0) {
+				if (!badge) {
+					badge = document.createElement('span');
+					badge.className = 'unread-badge';
+					supportTab.appendChild(badge);
+				}
+				badge.textContent = unread;
+			} else if (badge) {
+				badge.remove();
+			}
+		}
 	}
 
 	async selectService(serviceType) {
@@ -482,7 +576,7 @@ class UIController {
 		if (!address) return;
 
 		if (!ValidationService.validateAddress(address)) {
-			ModalService.show('Помилка', 'Введіть коректну адресу українською мовою (мінімум 10 символів)', 'error');
+			ModalService.show('Помилка', 'Введіть коректну адресу українською мовою у форматі: вул./пров./просп. Назва, номер будинку, кв. номер\n\nПриклад: вул. Івана Франка, 25, кв. 10', 'error');
 			return;
 		}
 
@@ -546,6 +640,75 @@ class UIController {
 				statusText = '<span class="status-badge status-debt">Борг</span>';
 			}
 			document.getElementById('contractStatus').innerHTML = statusText;
+
+			const contractActions = document.getElementById('contractActions');
+			if (contractActions) {
+				contractActions.innerHTML = `
+					<button class="submit-btn" id="editContractBtn" style="margin-top: 1rem;">Редагувати договір</button>
+					<button class="logout-btn" id="deleteContractBtn" style="margin-top: 0.5rem;">Видалити договір</button>
+					<button class="logout-btn" id="deleteAccountBtn" style="margin-top: 0.5rem; background: #d32f2f;">Видалити акаунт</button>
+				`;
+
+				document.getElementById('editContractBtn').addEventListener('click', () => this.handleEditContract(client));
+				document.getElementById('deleteContractBtn').addEventListener('click', () => this.handleDeleteContract(client));
+				document.getElementById('deleteAccountBtn').addEventListener('click', () => this.handleDeleteAccount(client));
+			}
+		} else {
+			document.getElementById('contractId').textContent = '';
+			document.getElementById('contractFIO').textContent = '';
+			document.getElementById('contractPhone').textContent = '';
+			document.getElementById('contractEmail').textContent = '';
+			document.getElementById('contractAddress').textContent = '';
+			document.getElementById('contractService').textContent = '';
+			document.getElementById('contractEquipment').textContent = '';
+			document.getElementById('contractStatus').innerHTML = '<span class="status-badge status-pending">Немає договору</span>';
+			document.getElementById('contractActions').innerHTML = '';
+		}
+	}
+
+	async handleEditContract(client) {
+		const address = await ModalService.prompt('Редагування договору', 'Введіть нову адресу:', client.contract.address);
+		if (!address) return;
+
+		if (!ValidationService.validateAddress(address)) {
+			ModalService.show('Помилка', 'Введіть коректну адресу українською мовою у форматі: вул./пров./просп. Назва, номер будинку, кв. номер', 'error');
+			return;
+		}
+
+		client.contract.address = address;
+		this.authService.updateUser(client);
+		this.updateContract(client);
+		ModalService.show('Успіх', 'Договір оновлено!', 'success');
+	}
+
+	async handleDeleteContract(client) {
+		const confirmed = await ModalService.confirm(
+			'Видалення договору',
+			'Ви впевнені, що хочете видалити договір? Ця дія незворотна.'
+		);
+
+		if (confirmed) {
+			client.contract = null;
+			client.connectionApproved = false;
+			client.balance = 0;
+			client.equipmentStatus = null;
+			this.authService.updateUser(client);
+			await ModalService.show('Успіх', 'Договір видалено!', 'success');
+
+			this.showClientDashboard(client);
+		}
+	}
+
+	async handleDeleteAccount(client) {
+		const confirmed = await ModalService.confirm(
+			'Видалення акаунта',
+			'Ви впевнені, що хочете видалити акаунт? Всі дані будуть втрачені назавжди!'
+		);
+
+		if (confirmed) {
+			this.authService.deleteUser(client.id);
+			this.handleLogout();
+			ModalService.show('Успіх', 'Акаунт видалено!', 'success');
 		}
 	}
 
@@ -555,6 +718,19 @@ class UIController {
 
 		event.target.classList.add('active');
 		document.getElementById(content + 'Content').classList.add('active');
+
+		if (content === 'support') {
+			const client = this.authService.currentUser;
+			if (client.messages) {
+				client.messages.forEach(m => {
+					if (m.from === 'support') m.read = true;
+				});
+				client.unreadMessages = 0;
+				this.authService.updateUser(client);
+				this.checkUnreadMessages(client);
+			}
+			this.loadClientChatMessages(client);
+		}
 	}
 
 	showSupportDashboard() {
@@ -579,12 +755,12 @@ class UIController {
 			const card = document.createElement('div');
 			card.className = 'ticket-card';
 			card.innerHTML = `
-                <h4>${user.fio}</h4>
-                <p>Email: ${user.email}</p>
-                <p>Телефон: ${user.phone}</p>
-                <p>Повідомлень: ${user.messages.length}</p>
-                <p class="status-badge status-pending" style="display: inline-block; margin-top: 0.5rem;">Активне</p>
-            `;
+								<h4>${user.fio}</h4>
+								<p>Email: ${user.email}</p>
+								<p>Телефон: ${user.phone}</p>
+								<p>Повідомлень: ${user.messages.length}</p>
+								<p class="status-badge status-pending" style="display: inline-block; margin-top: 0.5rem;">Активне</p>
+						`;
 			card.addEventListener('click', () => this.openSupportChat(user));
 			ticketsGrid.appendChild(card);
 		});
@@ -814,12 +990,63 @@ class UIController {
 
 		this.loadStaffList();
 		this.loadEquipment();
+		this.loadClientsList();
 
 		const oldBtn = document.getElementById('addStaffBtn');
 		const newBtn = oldBtn.cloneNode(true);
 		oldBtn.parentNode.replaceChild(newBtn, oldBtn);
 
 		newBtn.addEventListener('click', () => this.addStaff());
+	}
+
+	loadClientsList() {
+		const clientsGrid = document.getElementById('clientsListGrid');
+		if (!clientsGrid) return;
+
+		const clients = this.authService.users.filter(u => u.role === 'client');
+
+		clientsGrid.innerHTML = '';
+
+		if (clients.length === 0) {
+			clientsGrid.innerHTML = '<p style="grid-column: 1/-1; color: var(--gray-color);">Немає зареєстрованих клієнтів</p>';
+			return;
+		}
+
+		clients.forEach(client => {
+			const card = document.createElement('div');
+			card.className = 'ticket-card';
+			card.innerHTML = `
+				<h4>${client.fio}</h4>
+				<p>Email: ${client.email}</p>
+				<p>Телефон: ${client.phone}</p>
+				<p>Баланс: ${client.balance.toFixed(2)} грн</p>
+				${client.contract ? `<p class="status-badge ${client.connectionApproved ? 'status-active' : 'status-pending'}" style="display: inline-block; margin-top: 0.5rem;">${client.connectionApproved ? 'Підключено' : 'Очікує'}</p>` : '<p class="status-badge status-debt" style="display: inline-block; margin-top: 0.5rem;">Без договору</p>'}
+				<button class="logout-btn delete-client-btn" data-id="${client.id}" style="margin-top: 0.5rem; width: 100%;">Видалити клієнта</button>
+			`;
+			clientsGrid.appendChild(card);
+		});
+
+		document.querySelectorAll('.delete-client-btn').forEach(btn => {
+			btn.addEventListener('click', async (e) => {
+				e.stopPropagation();
+				const clientId = parseFloat(btn.dataset.id);
+				const client = this.authService.getUserById(clientId);
+
+				if (client) {
+					const confirmed = await ModalService.confirm(
+						'Видалення клієнта',
+						`Видалити клієнта ${client.fio}?\n\nВсі дані, включаючи договір та історію, будуть втрачені назавжди!`
+					);
+
+					if (confirmed) {
+						this.authService.deleteUser(clientId);
+						ModalService.show('Успіх', 'Клієнта видалено!', 'success');
+						this.loadClientsList();
+						this.loadEquipment();
+					}
+				}
+			});
+		});
 	}
 
 	loadStaffList() {
@@ -833,14 +1060,14 @@ class UIController {
 			item.className = 'service-card';
 			item.style.marginTop = '1rem';
 			item.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <strong>${s.name}</strong><br>
-                        <small>${s.email}</small>
-                    </div>
-                    <button class="logout-btn delete-staff-btn" data-email="${s.email}">Видалити</button>
-                </div>
-            `;
+								<div style="display: flex; justify-content: space-between; align-items: center;">
+										<div>
+												<strong>${s.name}</strong><br>
+												<small>${s.email}</small>
+										</div>
+										<button class="logout-btn delete-staff-btn" data-email="${s.email}">Видалити</button>
+								</div>
+						`;
 			staffList.appendChild(item);
 		});
 
@@ -944,6 +1171,7 @@ class UIController {
 					if (confirmed) {
 						client.connectionApproved = true;
 						client.contract.status = 'active';
+						client.equipmentStatus = 'online';
 						this.authService.updateUser(client);
 						ModalService.show('Успіх', 'Підключення підтверджено! Клієнт може активувати послугу після оплати.', 'success');
 						this.loadEquipment();
@@ -980,25 +1208,20 @@ class UIController {
 			});
 		});
 	}
-	// -----------------------------------------------------------
-	// Логіка "Забув пароль"
-	// -----------------------------------------------------------
+
 	async handleForgotPassword() {
 		const email = await ModalService.prompt('Відновлення паролю', 'Введіть ваш email:', 'user@example.com');
 		if (!email) return;
 
 		try {
-			// Крок 1: Отримати код
-			const code = this.authService.getTempCode(email); // Отримання коду
+			const code = this.authService.getTempCode(email);
 			await ModalService.show('Код надіслано', `Надіслано тимчасовий код на ваш email (імітація). Код: ${code}`, 'info');
 
-			// Крок 2: Ввести код
 			const userCode = await ModalService.prompt('Введення коду', 'Введіть 6-значний код з вашої пошти:');
 			if (!userCode) return;
 
 			this.authService.verifyCode(email, userCode);
 
-			// Крок 3: Встановити новий пароль
 			let newPassword, confirmPassword;
 
 			do {
@@ -1064,49 +1287,12 @@ class BillingService {
 		}, 86400000);
 	}
 
-// 	processMonthlyPayments() {
-// 		const clients = this.authService.users.filter(u => u.role === 'client' && u.contract && u.connectionApproved);
-
-// 		clients.forEach(client => {
-// 			const lastPayment = new Date(client.lastPaymentDate);
-// 			const now = new Date();
-// 			const daysSincePayment = (now - lastPayment) / (1000 * 60 * 60 * 24);
-
-// 			if (daysSincePayment >= 30) {
-// 				const amount = client.contract.serviceType === 'internet' ? 300 : 450;
-// 				client.balance -= amount;
-// 				client.lastPaymentDate = now;
-
-// 				if (client.balance < 0) {
-// 					client.contract.status = 'debt';
-// 				} else {
-// 					client.contract.status = 'active';
-// 				}
-
-// 				this.authService.updateUser(client);
-// 			}
-// 		});
-// 	}
-
-// 	makePayment(client, amount) {
-// 		client.balance += amount;
-// 		if (client.balance >= 0 && client.contract && client.connectionApproved) {
-// 			client.contract.status = 'active';
-// 		}
-// 		this.authService.updateUser(client);
-// 		return true;
-// 	}
-	
-	// -----------------------------------------------------------
-	// Логіка регулярних платежів
-	// -----------------------------------------------------------
 	toggleRecurringPayment(client) {
 		client.isRecurring = !client.isRecurring;
 		this.authService.updateUser(client);
 		return client.isRecurring;
 	}
 
-	// Оновіть метод makePayment, щоб він також зберігав статус
 	makePayment(client, amount, isRecurring = false) {
 		client.balance += amount;
 		if (isRecurring) {
@@ -1119,7 +1305,6 @@ class BillingService {
 		return true;
 	}
 
-	// Оновіть метод processMonthlyPayments, щоб він враховував регулярність
 	processMonthlyPayments() {
 		const clients = this.authService.users.filter(u => u.role === 'client' && u.contract && u.connectionApproved);
 
@@ -1127,27 +1312,23 @@ class BillingService {
 			const lastPayment = new Date(client.lastPaymentDate);
 			const now = new Date();
 			const daysSincePayment = (now - lastPayment) / (1000 * 60 * 60 * 24);
-			const isRecurring = client.isRecurring || false; // Перевірка статусу регулярного платежу
+			const isRecurring = client.isRecurring || false;
 
 			if (daysSincePayment >= 30) {
 				const amount = client.contract.serviceType === 'internet' ? 300 : 450;
-				
-				// Якщо є регулярний платіж і баланс дозволяє, проводимо списання
+
 				if (isRecurring && client.balance >= amount) {
 					client.balance -= amount;
 					client.lastPaymentDate = now;
 					console.log(`[BILLING] Регулярний платіж ${amount} грн списано для ${client.email}`);
 				} else if (isRecurring && client.balance < amount) {
-					// Якщо регулярний, але недостатньо коштів, все одно списуємо, але статус - борг
 					client.balance -= amount;
 					client.lastPaymentDate = now;
 					console.log(`[BILLING] Спроба регулярного платежу для ${client.email} - недостатньо коштів.`);
 				} else if (!isRecurring) {
-					// Якщо не регулярний, просто нараховуємо борг
 					client.balance -= amount;
 					client.lastPaymentDate = now;
 				}
-
 
 				if (client.balance < 0) {
 					client.contract.status = 'debt';
@@ -1160,7 +1341,6 @@ class BillingService {
 		});
 	}
 }
-
 
 class MessageService {
 	constructor(authService) {
@@ -1199,26 +1379,6 @@ const uiController = new UIController(authService);
 const billingService = new BillingService(authService);
 const messageService = new MessageService(authService);
 
-// // Payment button handler
-// document.getElementById('payBtn').addEventListener('click', async () => {
-// 	const client = authService.currentUser;
-
-// 	if (!client.connectionApproved) {
-// 		ModalService.show('Увага', 'Очікуйте підтвердження підключення від адміністратора. Оплата буде доступна після активації.', 'warning');
-// 		return;
-// 	}
-
-// 	const amount = await ModalService.prompt('Оплата', 'Введіть суму для оплати (грн):', '300');
-
-// 	if (amount && !isNaN(amount) && parseFloat(amount) > 0) {
-// 		billingService.makePayment(client, parseFloat(amount));
-// 		uiController.updateServiceStatus(client);
-// 		ModalService.show('Успіх', `Оплату на суму ${amount} грн успішно проведено!\n\nВаш новий баланс: ${client.balance.toFixed(2)} грн`, 'success');
-// 	} else if (amount !== null) {
-// 		ModalService.show('Помилка', 'Будь ласка, введіть коректну суму', 'error');
-// 	}
-// });
-
 // Payment button handler
 document.getElementById('payBtn').addEventListener('click', async () => {
 	const client = authService.currentUser;
@@ -1232,21 +1392,21 @@ document.getElementById('payBtn').addEventListener('click', async () => {
 
 	if (amount && !isNaN(amount) && parseFloat(amount) > 0) {
 		const parsedAmount = parseFloat(amount);
-		
+
 		const isRecurring = await ModalService.confirm(
-			'Регулярний платіж', 
+			'Регулярний платіж',
 			'Бажаєте зробити цей платіж регулярним (щомісячне автоматичне списання)?'
 		);
 
 		billingService.makePayment(client, parsedAmount, isRecurring);
-		
+
 		uiController.updateServiceStatus(client);
-		uiController.updateRecurringStatus(client); // Оновлення статусу
-		ModalService.show('Успіх', 
-			`Оплату на суму ${parsedAmount.toFixed(2)} грн успішно проведено!\n\n` + 
-			(isRecurring ? 'Активовано регулярний платіж.' : '') + 
-			`Ваш новий баланс: ${client.balance.toFixed(2)} грн`, 
-		'success');
+		uiController.updateRecurringStatus(client);
+		ModalService.show('Успіх',
+			`Оплату на суму ${parsedAmount.toFixed(2)} грн успішно проведено!\n\n` +
+			(isRecurring ? 'Активовано регулярний платіж.' : '') +
+			`Ваш новий баланс: ${client.balance.toFixed(2)} грн`,
+			'success');
 	} else if (amount !== null) {
 		ModalService.show('Помилка', 'Будь ласка, введіть коректну суму', 'error');
 	}
@@ -1276,6 +1436,17 @@ document.getElementById('sendMessageBtn').addEventListener('click', () => {
 			responseDiv.innerHTML = `<small>${new Date().toLocaleTimeString('uk-UA')}</small><br>Дякуємо за звернення! Наші спеціалісти опрацюють ваш запит найближчим часом.`;
 			chatMessages.appendChild(responseDiv);
 			chatMessages.scrollTop = chatMessages.scrollHeight;
+
+			const supportMsg = {
+				from: 'support',
+				to: user.email,
+				text: 'Дякуємо за звернення! Наші спеціалісти опрацюють ваш запит найближчим часом.',
+				timestamp: new Date(),
+				read: true
+			};
+			if (!user.messages) user.messages = [];
+			user.messages.push(supportMsg);
+			authService.updateUser(user);
 		}, 1000);
 	}
 });
