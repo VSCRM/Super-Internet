@@ -1,9 +1,3 @@
-
 .vscode/
-
-**/build/
-**/out/
-**/bin/
-
-Thumbs.db
-desktop.ini
+Photoshop/
+*.psd
