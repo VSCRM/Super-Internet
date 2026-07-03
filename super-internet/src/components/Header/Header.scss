@@ -1,0 +1,20 @@
+@use "../../styles/breakpoints" as bp;
+
+.top-line {
+	padding: 3.2em 0;
+}
+
+@media (max-width: #{bp.$mobile-nav}) {
+	.top-line .row {
+		justify-content: space-between;
+	}
+
+	.top-line .col:nth-child(2) {
+		flex: 0 0 auto;
+		width: auto;
+	}
+
+	.top-line .col:nth-child(3) {
+		order: 3;
+	}
+}

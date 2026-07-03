@@ -1,0 +1,26 @@
+@font-face {
+	font-family: "Jura";
+	src: url("../assets/fonts/Jura-VariableFont_wght.ttf");
+}
+
+@font-face {
+	font-family: "Jura";
+	src: url("../assets/fonts/Jura-VariableFont_wght.ttf");
+	font-weight: 700;
+}
+
+@font-face {
+	font-family: "Tektur";
+	src: url("../assets/fonts/Tektur-VariableFont_wdth,wght.ttf");
+}
+
+@font-face {
+	font-family: "Tektur";
+	src: url("../assets/fonts/Tektur-VariableFont_wdth,wght.ttf");
+	font-weight: 900;
+}
+
+body {
+	font-family: "Tektur", "Jura", sans-serif;
+	font-size: 18px;
+}

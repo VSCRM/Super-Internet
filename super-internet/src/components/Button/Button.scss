@@ -1,0 +1,37 @@
+@use "../../styles/breakpoints" as bp;
+
+.button {
+	padding: 1.05em 2.6em;
+	color: var(--white-color);
+	background-color: var(--purple-color);
+	border: 1.5px solid transparent;
+	border-radius: 10em 0 10em;
+	font-weight: 500;
+	text-decoration: none;
+	letter-spacing: 0.21em;
+	text-transform: uppercase;
+	font-size: 0.65em;
+	cursor: pointer;
+	pointer-events: auto;
+}
+
+.button--top {
+	background-color: transparent;
+	border-color: var(--purple-color);
+	margin: 0 2em 0 3em;
+}
+
+.button--main {
+	margin-top: 3em;
+	padding: 2em 4em;
+}
+
+.button:hover {
+	background-color: var(--purple-color);
+}
+
+@media (max-width: #{bp.$mobile-nav}) {
+	.button--top {
+		display: none;
+	}
+}

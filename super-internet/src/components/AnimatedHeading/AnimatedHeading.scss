@@ -1,0 +1,26 @@
+.letters {
+	font-size: calc(var(--index) * 4.5);
+	text-transform: uppercase;
+	font-weight: 900;
+}
+
+.letters .letter {
+	text-shadow: 25px 0 35px rgba(0 0 0 / 0.7);
+	position: relative;
+	margin-left: calc(var(--index) * -0.25);
+	margin-right: calc(var(--index) * -0.25);
+	opacity: 0;
+	top: -5em;
+	transition:
+		opacity var(--transition),
+		top var(--transition);
+}
+
+.header-content__slide.active .letter {
+	opacity: 1;
+	top: 0;
+}
+
+.header-content__slide.active + * .letter {
+	top: 5em;
+}

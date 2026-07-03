@@ -1,0 +1,80 @@
+// Full-viewport hero slider — pure CSS transforms, no JS height calculation.
+// Uses 100dvh so the height always matches the visual viewport regardless
+// of devtools, browser UI bars, or zoom level.
+
+.hero {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+}
+
+.hero__track {
+  position: absolute;
+  inset: 0;
+  transition: transform 1.1s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+// Each slide fills 100dvh exactly — no JS involvement.
+.hero__slide {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+// Background image layers with parallax offset driven by CSS custom property
+// set from JS (--parallax-offset). No Swiper needed.
+.hero__layer {
+  position: absolute;
+  inset: -15%;  // overscan so parallax never shows edges
+  background-size: cover;
+  background-position: center;
+  will-change: transform;
+  transition: transform 1.1s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+// Scale-up effect on active slide (replaces Swiper's transform: scale hack)
+.hero__slide--active .hero__layer {
+  transform: scale(1.08);
+}
+
+// UI overlay (header + content) sits above all slides
+.slider-ui {
+  position: fixed;
+  z-index: 10;
+  inset: 0;
+  pointer-events: none;
+}
+
+.logo,
+.main-menu,
+.button,
+.hamburger-menu {
+  pointer-events: auto;
+}
+
+.header-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+}
+
+.header-content {
+  flex: 1;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  line-height: 1;
+  flex-direction: column;
+  position: relative;
+}
+
+.header-content__slide {
+  position: absolute;
+}
+
+.header-bottom {
+  min-height: 120px;
+}

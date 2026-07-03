@@ -1,0 +1,27 @@
+.tickets-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+	gap: 1rem;
+}
+
+.ticket-card {
+	background: rgba(55, 25, 77, 0.95);
+	border: 2px solid var(--purple-color);
+	border-radius: 10px;
+	padding: 1.5rem;
+	cursor: pointer;
+	transition: all 0.3s;
+	position: relative;
+}
+
+.ticket-card:hover {
+	transform: translateY(-3px);
+	box-shadow: 0 5px 15px rgba(206, 147, 255, 0.4);
+	border-color: rgb(184, 122, 219);
+}
+
+@media (max-width: 768px) {
+	.tickets-grid {
+		grid-template-columns: 1fr;
+	}
+}
