@@ -415,6 +415,7 @@ super-internet/
 │   ├── types/
 │   │   └── models.ts
 │   ├── App.tsx
+│   ├── index.css
 │   └── main.tsx
 ├── .env.example
 ├── .gitignore
