@@ -1,0 +1,60 @@
+.address-field {
+	display: flex;
+	flex-direction: column;
+	gap: 0.4em;
+	margin-bottom: 1.2em;
+	text-align: left;
+}
+
+.address-field__label {
+	font-size: 0.85em;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+	opacity: 0.8;
+}
+
+.address-field__requirements {
+	list-style: none;
+	margin: 0.5em 0 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 0.3em;
+}
+
+.address-field__requirement {
+	display: flex;
+	align-items: center;
+	gap: 0.5em;
+	font-size: 0.8em;
+	transition: color 0.2s ease-in-out;
+}
+
+.address-field__requirement--unmet {
+	color: #e57373;
+}
+
+.address-field__requirement--met {
+	color: #66bb6a;
+}
+
+.address-field__requirement-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 1.4em;
+	height: 1.4em;
+	border-radius: 50%;
+	font-size: 0.75em;
+	flex-shrink: 0;
+}
+
+.address-field__requirement--unmet .address-field__requirement-icon {
+	background-color: rgba(229, 115, 115, 0.18);
+	border: 1px solid #e57373;
+}
+
+.address-field__requirement--met .address-field__requirement-icon {
+	background-color: rgba(102, 187, 106, 0.18);
+	border: 1px solid #66bb6a;
+}

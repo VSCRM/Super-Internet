@@ -1,0 +1,335 @@
+{
+	"common": {
+		"appName": "Super-Internet"
+	},
+	"modal": {
+		"ok": "OK",
+		"yes": "Yes",
+		"no": "No",
+		"confirm": "Confirm",
+		"cancel": "Cancel",
+		"error": "Error",
+		"success": "Success"
+	},
+	"errorBoundary": {
+		"title": "Something went wrong",
+		"message": "An unexpected error occurred. Try reloading the page.",
+		"reload": "Reload page"
+	},
+	"auth": {
+		"tabs": {
+			"login": "Log in",
+			"register": "Sign up"
+		},
+		"fields": {
+			"email": "Email",
+			"password": "Password",
+			"phone": "Phone",
+			"fio": "Full name",
+			"passwordConfirm": "Confirm password"
+		},
+		"forgotPassword": "Forgot password",
+		"submitLogin": "Log in",
+		"submitRegister": "Sign up",
+		"registrationSuccessTitle": "Success",
+		"registrationSuccessMessage": "Registration complete! Now choose a service."
+	},
+	"recovery": {
+		"title": "Password recovery",
+		"emailHint": "Enter your email - we'll send a verification code.",
+		"sendCode": "Send code",
+		"cancel": "Cancel",
+		"codeHint": "Enter the 6-digit code sent to {{email}}.",
+		"codeLabel": "Verification code",
+		"verifyCode": "Verify code",
+		"resendCode": "Resend code",
+		"codeVerifiedHint": "Code verified. Set a new password.",
+		"newPasswordLabel": "New password",
+		"passwordConfirmLabel": "Confirm password",
+		"resetAndLogin": "Change password and log in",
+		"successHint": "Password changed successfully! Logging in...",
+		"passwordsMismatch": "Passwords do not match"
+	},
+	"dashboard": {
+		"welcome": "Welcome, {{name}}!",
+		"roles": {
+			"client": "Client",
+			"support": "Support",
+			"admin": "Administrator"
+		},
+		"logout": "Log out",
+		"loading": "Loading...",
+		"nav": {
+			"status": "Service status",
+			"contract": "Contract",
+			"profile": "Profile",
+			"support": "Support",
+			"staff": "Staff",
+			"equipment": "Equipment",
+			"clients": "Clients",
+			"tickets": "Tickets"
+		}
+	},
+	"status": {
+		"pending": "Pending connection",
+		"active": "Active",
+		"debt": "Outstanding balance"
+	},
+	"contract": {
+		"statusActive": "Active",
+		"statusDebt": "Debt",
+		"statusPending": "Pending connection",
+		"noContract": "No contract",
+		"title": "Contract #{{id}}",
+		"fio": "Full name:",
+		"phone": "Phone:",
+		"email": "Email:",
+		"address": "Address:",
+		"serviceType": "Service type:",
+		"equipmentId": "Equipment ID:",
+		"equipmentIdImmutable": "Equipment ID (read-only):",
+		"contractNumberImmutable": "Contract number (read-only):",
+		"status": "Status:",
+		"edit": "Edit contract",
+		"delete": "Delete contract",
+		"deleteAccount": "Delete account",
+		"notIssued": "No contract issued",
+		"addressNotSpecified": "Not specified"
+	},
+	"service": {
+		"internetTitle": "Internet",
+		"internetDesc": "Fast and reliable connection",
+		"internetPrice": "300 UAH/mo",
+		"internetTvTitle": "Internet + TV",
+		"internetTvDesc": "Double the value!",
+		"internetTvPrice": "450 UAH/mo",
+		"currentService": "Current service",
+		"balance": "Balance:",
+		"balanceValue": "{{amount}} UAH",
+		"nextPayment": "Next payment:",
+		"recurringPayment": "Recurring payment",
+		"recurringActive": "Active",
+		"recurringInactive": "Inactive",
+		"pay": "Pay"
+	},
+	"support": {
+		"chatTitle": "Chat with technical support",
+		"noMessagesYet": "No messages yet"
+	},
+	"staff": {
+		"panelTitle": "Staff management",
+		"add": "Add staff member",
+		"save": "Save",
+		"cancel": "Cancel",
+		"fioLabel": "Staff member's full name",
+		"passwordLabel": "Password",
+		"listTitle": "Support staff:",
+		"delete": "Delete",
+		"deleteConfirmTitle": "Confirmation",
+		"deleteConfirmMessage": "Delete this staff member?",
+		"deletedMessage": "Staff member deleted!",
+		"addedMessage": "Staff member added!",
+		"defaultSupportName": "Support Team"
+	},
+	"equipment": {
+		"panelTitle": "Equipment monitoring",
+		"empty": "No connected equipment",
+		"statusOnline": "Online",
+		"statusOffline": "Offline",
+		"statusPending": "Pending",
+		"approve": "Approve",
+		"turnOn": "Turn on",
+		"turnOff": "Turn off",
+		"tooltip": "Client: {{fio}}\nAddress: {{address}}\nService: {{service}}\nStatus: {{status}}",
+		"approveConfirmTitle": "Confirm connection",
+		"approveConfirmMessage": "Approve the connection for {{fio}}?\n\nAddress: {{address}}\nService: {{service}}",
+		"approvedMessage": "Connection approved! The client can activate the service after payment.",
+		"statusChangeConfirmTitle": "Change equipment status",
+		"statusChangeConfirmMessage": "{{action}} equipment {{equipmentId}}?\n\nClient: {{fio}}",
+		"turnedOnMessage": "Equipment turned on!",
+		"turnedOffMessage": "Equipment turned off!",
+		"serviceInternet": "Internet",
+		"serviceInternetTv": "Internet + TV"
+	},
+	"clients": {
+		"panelTitle": "Client management",
+		"empty": "No registered clients",
+		"phone": "Phone: {{phone}}",
+		"balance": "Balance: {{amount}} UAH",
+		"connected": "Connected",
+		"pending": "Pending",
+		"noContract": "No contract",
+		"delete": "Delete client",
+		"deleteConfirmTitle": "Delete client",
+		"deleteConfirmMessage": "Delete client {{fio}}?\n\nAll data, including the contract and history, will be lost forever!",
+		"deletedMessage": "Client deleted!"
+	},
+	"tickets": {
+		"navLabel": "Tickets",
+		"panelTitle": "Active tickets",
+		"empty": "No active tickets",
+		"messagesFromClient": "Messages from client: {{count}}",
+		"newMessages": "New messages",
+		"activeStatus": "Active",
+		"closeConfirmTitle": "Close ticket",
+		"closeConfirmMessage": "Close the ticket from {{fio}}? All messages will be deleted.",
+		"closedMessage": "Ticket closed!",
+		"viewProfile": "View profile",
+		"closeTicket": "Close ticket",
+		"closeAria": "Close chat",
+		"chatWith": "Chat with {{fio}}"
+	},
+	"profile": {
+		"modalTitle": "Client profile",
+		"close": "Close",
+		"statusTab": "Service status",
+		"contractTab": "Contract",
+		"myProfile": "My profile",
+		"save": "Save changes",
+		"updatedMessage": "Profile updated!",
+		"contractUpdatedMessage": "Contract updated!"
+	},
+	"account": {
+		"deleteConfirmTitle": "Delete account",
+		"deleteConfirmMessage": "Are you sure you want to delete your account? All data will be permanently lost!",
+		"deletedMessage": "Account deleted!"
+	},
+	"payment": {
+		"notApprovedTitle": "Notice",
+		"notApprovedMessage": "Waiting for connection approval from the administrator. Payment will be available after activation.",
+		"promptTitle": "Payment",
+		"promptMessage": "Enter the payment amount (UAH):",
+		"invalidAmount": "Please enter a valid amount",
+		"recurringPromptTitle": "Recurring payment",
+		"recurringPromptMessage": "Would you like to make this payment recurring (automatic monthly charge)?",
+		"successTitle": "Success",
+		"successMessage": "Payment of {{amount}} UAH was completed successfully!\n\n",
+		"recurringActivatedLine": "Recurring payment activated.\n",
+		"newBalance": "Your new balance: {{balance}} UAH",
+		"recurringToggledOn": "Recurring payment activated!",
+		"recurringToggledOff": "Recurring payment deactivated!",
+		"chargeDescription": "Service payment, contract {{contractId}}"
+	},
+	"address": {
+		"promptTitle": "Connection address",
+		"promptMessage": "Enter your full address (street, house number, apartment):",
+		"acceptedTitle": "Request accepted",
+		"acceptedMessage": "Service selected successfully!\n\nYour address: {{address}}\n\nWait for connection approval from the administrator.",
+		"editTitle": "Edit contract",
+		"editMessage": "Enter the new address:",
+		"updatedMessage": "Contract updated!",
+		"deleteConfirmTitle": "Delete contract",
+		"deleteConfirmMessage": "Are you sure you want to delete the contract? This action is irreversible.",
+		"deletedMessage": "Contract deleted!",
+		"label": "Address",
+		"placeholder": "12 Main St, Apt 3",
+		"requirements": {
+			"cyrillic": "Address is written in Ukrainian",
+			"street": "Street type (вул. / просп. / пров. / бульв. / площа / майдан)",
+			"number": "House number (a digit)",
+			"length": "At least 15 characters"
+		}
+	},
+	"password": {
+		"requirements": {
+			"length": "At least {{min}} characters",
+			"digit": "At least one digit",
+			"uppercase": "At least one uppercase letter"
+		}
+	},
+	"chat": {
+		"placeholder": "Type a message...",
+		"send": "Send",
+		"autoReply": "Thanks for reaching out! Our specialists will handle your request shortly."
+	},
+	"email": {
+		"examplesLabel": "Examples of the correct format:"
+	},
+	"pagination": {
+		"ariaLabel": "Pages",
+		"prevAriaLabel": "Previous page",
+		"nextAriaLabel": "Next page",
+		"status": "{{page}} of {{count}}"
+	},
+	"languageSwitcher": {
+		"ariaLabel": "Мова / Language"
+	},
+	"input": {
+		"showPassword": "Show password",
+		"hidePassword": "Hide password"
+	},
+	"errors": {
+		"clientNotFound": "Client not found",
+		"emailTaken": "A user with this email already exists",
+		"unknownServerError": "An unexpected error occurred while contacting the server",
+		"lockedOutLogin": "Too many failed login attempts. Try again in {{seconds}}s.",
+		"invalidCredentials": "Invalid email or password",
+		"userNotFoundByEmail": "No user found with this email",
+		"lockedOutCode": "Too many failed attempts. Try again in {{seconds}}s.",
+		"invalidCode": "Invalid or expired code",
+		"userNotFound": "User not found",
+		"emailSendFailed": "Failed to send the verification code email",
+		"invalidPaymentAmount": "The payment amount must be greater than 0",
+		"privatBankChargeFailed": "Failed to process the payment via PrivatBank"
+	},
+	"landing": {
+		"menu": {
+			"home": "Home",
+			"about": "About us",
+			"pricing": "Pricing",
+			"contacts": "Contacts"
+		},
+		"login": "Log in",
+		"connectNow": "Connect now",
+		"slides": {
+			"features": {
+				"title": "Incredible possibilities",
+				"body": "Fast, stable internet at an affordable price. We guarantee quality, reliability, and modern technology for your home and business."
+			},
+			"about": {
+				"title": "About our company",
+				"body": "Super Internet is a fiber-optic broadband provider. We work honestly and transparently, ensuring a stable connection and 24/7 support."
+			},
+			"pricing": {
+				"title": "Pricing",
+				"intro": "Choose your plan:",
+				"internet": "Internet - fast, reliable connection.",
+				"internetTv": "Internet + TV - double the value."
+			},
+			"contacts": {
+				"title": "Contacts",
+				"address": "📍 Address: Kalush, Sichovykh Striltsiv St, 15",
+				"email": "📧 Email: bohdan.kruchkevych-ip231@nung.edu.ua",
+				"phone": "📞 Phone: +380 XX XXX XX XX"
+			}
+		}
+	},
+	"validation": {
+		"email": {
+			"required": "Email is required",
+			"domainFormat": "Email must end with @gmail.com, @ukr.net, or similar",
+			"invalid": "Invalid email format"
+		},
+		"phone": {
+			"format": "Phone format: +380XXXXXXXXX"
+		},
+		"fio": {
+			"format": "Enter your full name in Ukrainian (3 capitalized words)"
+		},
+		"password": {
+			"required": "Password is required",
+			"mismatch": "Passwords do not match"
+		},
+		"code": {
+			"length": "The code must be 6 digits",
+			"digitsOnly": "The code must contain digits only"
+		},
+		"staffName": {
+			"format": "Enter the staff member's name (minimum 2 characters)"
+		},
+		"amount": {
+			"positive": "The amount must be greater than 0",
+			"maxExceeded": "The amount exceeds the allowed limit"
+		}
+	}
+}

@@ -1,0 +1,32 @@
+.support-chat {
+	background: rgba(55, 25, 77, 0.95);
+	border: 2px solid var(--purple-color);
+	border-radius: 20px;
+	padding: 2rem;
+	max-width: 800px;
+	margin: 0 auto;
+}
+
+.recurring-payment {
+	margin-top: 1.5rem;
+}
+
+.recurring-payment__row {
+	display: flex;
+	align-items: center;
+	margin-top: 0.5rem;
+	gap: 1rem;
+}
+
+.recurring-payment__status {
+	font-weight: bold;
+}
+
+.contract-actions {
+	text-align: center;
+}
+
+.contract-actions__button {
+	margin-top: 0.5rem;
+	margin-left: 0.5rem;
+}

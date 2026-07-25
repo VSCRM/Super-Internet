@@ -1,0 +1,401 @@
+openapi: 3.0.3
+info:
+  title: Super-Internet API
+  version: "1.0.0"
+  description: |
+    Контракт бекенду, який очікує фронтенд у `VITE_BACKEND_MODE=true`.
+
+    **Статус:** цей бекенд ще не реалізований. Специфікація описує рівно ті
+    запити, які вже викликає код фронтенду (`src/services/auth/ApiAuthStrategy.ts`),
+    і рекомендований REST-контракт для `src/services/repositories/UserRepository.ts`
+    (`ApiUserRepository` — навмисна заглушка `NOT_IMPLEMENTED`, готова під ці ендпоінти).
+
+    ### Автентифікація
+    Сесія передається через **HttpOnly, Secure, SameSite=Lax (мінімум)** cookie,
+    яку встановлює сервер у відповідь на `POST /auth/login` і `POST /auth/register`.
+    Фронтенд ніколи не читає й не зберігає токен сам — лише покладається на те, що
+    браузер автоматично надсилає cookie (`withCredentials: true`).
+
+    ### CSRF
+    Кожна відповідь бекенду, що встановлює сесійну cookie, має додатково встановити
+    **читабельну** (не HttpOnly) cookie `XSRF-TOKEN`. Фронтенд (axios) автоматично
+    відправляє її значення в заголовку `X-XSRF-TOKEN` на кожен запит. Бекенд повинен
+    відхиляти будь-який state-changing запит (`POST`/`PUT`/`DELETE`), де заголовок не
+    збігається з cookie.
+
+    ### Важливо: форма відповіді користувача
+    `passwordHash`/`passwordSalt` — це поля внутрішньої моделі репозиторію і
+    **ніколи** не повинні потрапляти у відповідь API. Схеми нижче (`PublicClientUser`
+    і т.д.) свідомо не містять цих полів.
+  contact:
+    name: "<your-username>"
+    url: "https://github.com/<your-username>/Super-Internet"
+  license:
+    name: MIT
+    url: "https://opensource.org/licenses/MIT"
+
+servers:
+  - url: /api
+    description: Відносний шлях, що відповідає VITE_API_BASE_URL
+
+tags:
+  - name: auth
+    description: Сесія, вхід, реєстрація
+  - name: users
+    description: CRUD над користувачами (клієнти/підтримка/адмін), договорами, чатом
+
+paths:
+  /auth/register:
+    post:
+      tags: [auth]
+      summary: Реєстрація нового клієнта
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterPayload"
+      responses:
+        "200":
+          description: Успішна реєстрація. Встановлює сесійну та XSRF-TOKEN cookies.
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+              description: HttpOnly session cookie + readable XSRF-TOKEN cookie
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublicClientUser"
+        "409":
+          description: Email вже зареєстровано
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /auth/login:
+    post:
+      tags: [auth]
+      summary: Вхід за email + паролем
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string, format: password }
+      responses:
+        "200":
+          description: Успішний вхід. Встановлює сесійну та XSRF-TOKEN cookies.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublicUser"
+        "401":
+          description: Невірний email або пароль
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "429":
+          description: >
+            Забагато невдалих спроб (бекенд ЗОБОВ'ЯЗАНИЙ рахувати спроби
+            незалежно від фронтенду — клієнтський rate-limiter лише UX-заглушка).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/logout:
+    post:
+      tags: [auth]
+      summary: Вихід — інвалідує сесію на сервері
+      responses:
+        "200":
+          description: Сесію очищено (Set-Cookie з простроченим терміном дії)
+
+  /auth/session:
+    get:
+      tags: [auth]
+      summary: Поточний користувач за сесійною cookie
+      responses:
+        "200":
+          description: Активна сесія
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublicUser"
+        "401":
+          description: Немає активної сесії (фронтенд трактує це як "гість", не як помилку)
+
+  /users:
+    get:
+      tags: [users]
+      summary: Список користувачів
+      description: >
+        Використовується адмінкою/підтримкою. Бекенд має перевіряти роль
+        викликача (лише `admin`/`support`) — фронтенд не є межею авторизації.
+      parameters:
+        - name: email
+          in: query
+          required: false
+          schema: { type: string, format: email }
+          description: Точний пошук за email (для `findByEmail`)
+        - name: role
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [client, support, admin]
+      responses:
+        "200":
+          description: Масив користувачів
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PublicUser"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+    put:
+      tags: [users]
+      summary: Пакетне збереження (`UserRepository.saveAll`)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/PublicUser"
+      responses:
+        "200":
+          description: Збережені користувачі
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PublicUser"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /users/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: integer }
+    get:
+      tags: [users]
+      summary: Користувач за ID
+      responses:
+        "200":
+          description: Користувача знайдено
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublicUser"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      tags: [users]
+      summary: Оновити користувача (`UserRepository.save`)
+      description: >
+        Використовується для всього, що по суті є "перезаписати цього користувача":
+        зміна профілю, договору, балансу, повідомлень чату, статусу обладнання
+        тощо — фронтенд завжди читає повний запис, змінює потрібні поля і
+        зберігає назад повний об'єкт (read-modify-write, див.
+        `context/useClientMutation.ts`).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PublicUser"
+      responses:
+        "200":
+          description: Оновлений користувач
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublicUser"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+    delete:
+      tags: [users]
+      summary: Видалити користувача
+      responses:
+        "204":
+          description: Видалено
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+components:
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: session
+      description: HttpOnly, Secure, SameSite session cookie set by /auth/login
+
+  responses:
+    NotFound:
+      description: Не знайдено
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Forbidden:
+      description: Немає прав на цю дію
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    ValidationError:
+      description: Тіло запиту не пройшло валідацію
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
+  schemas:
+    ErrorResponse:
+      type: object
+      required: [code, message]
+      properties:
+        code: { type: string, example: "INVALID_CREDENTIALS" }
+        message: { type: string, example: "Невірний email або пароль" }
+
+    RegisterPayload:
+      type: object
+      required: [email, password, phone, fio]
+      properties:
+        email: { type: string, format: email }
+        password: { type: string, format: password, minLength: 6 }
+        phone: { type: string, example: "+380501234567" }
+        fio: { type: string, example: "Іванов Іван Іванович" }
+
+    ChatMessage:
+      type: object
+      required: [from, to, text, timestamp, read]
+      properties:
+        from: { type: string }
+        to: { type: string }
+        text: { type: string }
+        timestamp: { type: string, format: date-time }
+        read: { type: boolean }
+
+    Contract:
+      type: object
+      required:
+        [
+          id,
+          userId,
+          fio,
+          phone,
+          email,
+          address,
+          serviceType,
+          equipmentId,
+          status,
+          createdAt,
+        ]
+      properties:
+        id: { type: string, example: "CNT1719000000000" }
+        userId: { type: integer }
+        fio: { type: string }
+        phone: { type: string }
+        email: { type: string, format: email }
+        address: { type: string }
+        serviceType: { type: string, enum: [internet, internet_tv] }
+        equipmentId:
+          type: string
+          description: Незмінний після створення - редагування заборонене на UI і має бути заборонене на бекенді
+        status: { type: string, enum: [pending, active, debt] }
+        createdAt: { type: string, format: date-time }
+
+    PublicClientUser:
+      type: object
+      description: Форма відповіді для role=client. НІКОЛИ не містить passwordHash/passwordSalt.
+      required:
+        [
+          id,
+          email,
+          role,
+          phone,
+          fio,
+          balance,
+          messages,
+          lastPaymentDate,
+          connectionApproved,
+          unreadMessages,
+        ]
+      properties:
+        id: { type: integer }
+        email: { type: string, format: email }
+        role: { type: string, enum: [client] }
+        phone: { type: string }
+        fio: { type: string }
+        contract:
+          nullable: true
+          allOf:
+            - $ref: "#/components/schemas/Contract"
+        balance: { type: number, format: double }
+        messages:
+          type: array
+          items: { $ref: "#/components/schemas/ChatMessage" }
+        lastPaymentDate: { type: string, format: date-time }
+        connectionApproved: { type: boolean }
+        unreadMessages:
+          type: integer
+          description: Лічильник непрочитаних ПІДТРИМКОЮ повідомлень від цього клієнта (не загальна кількість)
+        isRecurring: { type: boolean }
+        equipmentStatus: { type: string, enum: [online, offline, pending] }
+
+    PublicSupportUser:
+      type: object
+      required: [id, email, role, name]
+      properties:
+        id: { type: integer }
+        email: { type: string, format: email }
+        role: { type: string, enum: [support] }
+        name: { type: string }
+
+    PublicAdminUser:
+      type: object
+      required: [id, email, role]
+      properties:
+        id: { type: integer }
+        email: { type: string, format: email }
+        role: { type: string, enum: [admin] }
+
+    PublicUser:
+      oneOf:
+        - $ref: "#/components/schemas/PublicClientUser"
+        - $ref: "#/components/schemas/PublicSupportUser"
+        - $ref: "#/components/schemas/PublicAdminUser"
+      discriminator:
+        propertyName: role
+        mapping:
+          client: "#/components/schemas/PublicClientUser"
+          support: "#/components/schemas/PublicSupportUser"
+          admin: "#/components/schemas/PublicAdminUser"
+
+security:
+  - sessionCookie: []

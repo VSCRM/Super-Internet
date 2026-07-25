@@ -1,0 +1,122 @@
+.staff-card {
+	background: rgba(255, 255, 255, 0.05);
+	border-radius: 10px;
+	padding: 1.5rem;
+	margin-top: 1rem;
+}
+
+.staff-card__row {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 1rem;
+}
+
+.add-staff-form {
+	background: rgba(255, 255, 255, 0.05);
+	border-radius: 10px;
+	padding: 1.5rem;
+	margin-top: 1rem;
+}
+
+.add-staff-form__actions {
+	display: flex;
+	gap: 1rem;
+	flex-wrap: wrap;
+}
+
+.equipment-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+	gap: 1rem;
+}
+
+.equipment-item {
+	background: rgba(255, 255, 255, 0.05);
+	border: 2px solid var(--gray-color);
+	border-radius: 10px;
+	padding: 1.5rem;
+	transition: all 0.3s;
+}
+
+.equipment-item--online {
+	border-color: var(--success-color);
+}
+
+.equipment-item--offline {
+	border-color: var(--error-color);
+}
+
+.equipment-item--pending {
+	border-color: var(--warning-color);
+}
+
+.equipment-status-badge {
+	font-size: 0.8rem;
+	padding: 0.3rem 0.6rem;
+	margin-top: 0.5rem;
+	display: inline-block;
+}
+
+.equipment-actions {
+	display: flex;
+	gap: 0.5rem;
+	margin-top: 1rem;
+	flex-wrap: wrap;
+}
+
+.approve-button {
+	flex: 1;
+	padding: 0.5rem;
+	background: var(--success-color);
+	border: none;
+	border-radius: 8px;
+	color: rgb(255, 255, 255);
+	cursor: pointer;
+	font-family: Tektur, sans-serif;
+	font-size: 0.85rem;
+	transition: all 0.3s;
+}
+
+.approve-button:hover {
+	background: rgb(64, 191, 90);
+}
+
+.status-control-button {
+	flex: 1;
+	padding: 0.5rem;
+	border: none;
+	border-radius: 8px;
+	color: rgb(255, 255, 255);
+	cursor: pointer;
+	font-family: Tektur, sans-serif;
+	font-size: 0.85rem;
+	transition: all 0.3s;
+}
+
+.status-control-button--online {
+	background: var(--success-color);
+}
+
+.status-control-button--online:hover {
+	background: rgb(64, 191, 90);
+}
+
+.status-control-button--offline {
+	background: var(--error-color);
+}
+
+.status-control-button--offline:hover {
+	background: rgb(214, 90, 78);
+}
+
+.empty-state {
+	color: var(--gray-color);
+}
+
+@media (max-width: 768px) {
+	.equipment-grid {
+		grid-template-columns: 1fr;
+	}
+}

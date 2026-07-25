@@ -1,0 +1,19 @@
+.form-field {
+	display: flex;
+	flex-direction: column;
+	gap: 0.4em;
+	margin-bottom: 1.2em;
+	text-align: left;
+}
+
+.form-field__label {
+	font-size: 0.85em;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+	opacity: 0.8;
+}
+
+.form-field__error {
+	font-size: 0.8em;
+	color: #e57373;
+}

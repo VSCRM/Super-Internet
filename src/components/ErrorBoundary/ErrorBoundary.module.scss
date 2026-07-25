@@ -1,0 +1,45 @@
+.error-boundary {
+	min-height: 100vh;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgb(55, 25, 77);
+	padding: 2rem;
+}
+
+.error-boundary__card {
+	background: rgba(55, 25, 77, 0.95);
+	border: 2px solid var(--purple-color);
+	border-radius: 20px;
+	padding: 3rem 2rem;
+	text-align: center;
+	max-width: 480px;
+	color: var(--white-color);
+	font-family: Tektur, sans-serif;
+}
+
+.error-boundary__card h2 {
+	margin-bottom: 1rem;
+	text-transform: uppercase;
+}
+
+.error-boundary__card p {
+	color: var(--gray-color);
+	margin-bottom: 2rem;
+}
+
+.error-boundary__button {
+	padding: 1rem 2rem;
+	background: var(--purple-color);
+	border: none;
+	border-radius: 10px;
+	color: var(--white-color);
+	font-family: Tektur, sans-serif;
+	text-transform: uppercase;
+	cursor: pointer;
+	transition: transform 0.3s;
+}
+
+.error-boundary__button:hover {
+	transform: translateY(-2px);
+}

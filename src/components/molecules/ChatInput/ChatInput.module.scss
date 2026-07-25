@@ -1,0 +1,38 @@
+.chat-input {
+	display: flex;
+	gap: 1rem;
+	flex-wrap: wrap;
+}
+
+.chat-input input {
+	flex: 1;
+	min-width: 200px;
+	padding: 1rem;
+	background: rgba(255, 255, 255, 0.1);
+	border: 2px solid var(--gray-color);
+	border-radius: 10px;
+	color: var(--white-color);
+	font-family: Tektur, sans-serif;
+	transition: border-color 0.3s;
+}
+
+.chat-input input:focus {
+	outline: none;
+	border-color: var(--purple-color);
+}
+
+.chat-input__send {
+	width: auto;
+	padding: 1rem 2rem;
+}
+
+@media (max-width: 768px) {
+	.chat-input {
+		flex-direction: column;
+	}
+
+	.chat-input input,
+	.chat-input__send {
+		width: 100%;
+	}
+}

@@ -1,0 +1,23 @@
+.dashboard-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 2rem;
+	padding-bottom: 1rem;
+	border-bottom: 2px solid var(--purple-color);
+	flex-wrap: wrap;
+	gap: 1rem;
+}
+
+.user-info {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	flex-wrap: wrap;
+}
+
+.dashboard-header__actions {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+}

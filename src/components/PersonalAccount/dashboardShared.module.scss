@@ -1,0 +1,164 @@
+.nav-tabs {
+	display: flex;
+	gap: 1rem;
+	margin-bottom: 2rem;
+	flex-wrap: wrap;
+}
+
+.nav-tab {
+	padding: 1rem 2rem;
+	background: rgba(255, 255, 255, 0.1);
+	border: 2px solid var(--gray-color);
+	color: var(--gray-color);
+	border-radius: 10px;
+	cursor: pointer;
+	font-family: Tektur, sans-serif;
+	text-transform: uppercase;
+	transition: all 0.3s;
+	position: relative;
+}
+
+.nav-tab--active {
+	background: var(--purple-color);
+	border-color: var(--purple-color);
+	color: var(--white-color);
+	transform: translateY(-3px);
+}
+
+.nav-tab:hover {
+	border-color: var(--purple-color);
+}
+
+.tab-content {
+	animation: fadeIn 0.4s ease;
+}
+
+.service-card {
+	background: rgba(55, 25, 77, 0.95);
+	border: 2px solid var(--purple-color);
+	border-radius: 20px;
+	padding: 2rem;
+	margin-bottom: 2rem;
+	animation: slideUp 0.4s ease;
+}
+
+.service-selection {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+	gap: 2rem;
+	margin-bottom: 2rem;
+}
+
+.service-option {
+	background: rgba(55, 25, 77, 0.95);
+	border: 2px solid var(--gray-color);
+	border-radius: 20px;
+	padding: 2rem;
+	cursor: pointer;
+	transition: all 0.3s;
+	text-align: center;
+}
+
+.service-option:hover {
+	border-color: var(--purple-color);
+	transform: translateY(-5px);
+	box-shadow: 0 5px 20px rgba(206, 147, 255, 0.4);
+}
+
+.service-option h3 {
+	color: var(--purple-color);
+	margin-bottom: 1rem;
+}
+
+.contract-view {
+	background: rgba(255, 255, 255, 0.95);
+	color: rgb(51, 51, 51);
+	padding: 3rem;
+	border-radius: 10px;
+	max-width: 800px;
+	margin: 0 auto;
+}
+
+.contract-field {
+	margin-bottom: 1rem;
+	display: flex;
+	justify-content: space-between;
+	padding: 0.5rem 0;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+
+.contract-field label {
+	font-weight: bold;
+	color: var(--dark-purple);
+}
+
+.tickets-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+	gap: 1rem;
+}
+
+.ticket-card {
+	background: rgba(55, 25, 77, 0.95);
+	border: 2px solid var(--purple-color);
+	border-radius: 10px;
+	padding: 1.5rem;
+	cursor: pointer;
+	transition: all 0.3s;
+	position: relative;
+}
+
+.ticket-card:hover {
+	transform: translateY(-3px);
+	box-shadow: 0 5px 15px rgba(206, 147, 255, 0.4);
+	border-color: rgb(184, 122, 219);
+}
+
+.unread-badge {
+	position: absolute;
+	top: -8px;
+	right: -8px;
+	background: rgb(231, 76, 60);
+	color: rgb(255, 255, 255);
+	border-radius: 50%;
+	min-width: 22px;
+	height: 22px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 0.75rem;
+	font-weight: bold;
+	padding: 0 6px;
+	animation: pulse 2s infinite;
+	box-shadow: 0 0 10px rgba(231, 76, 60, 0.6);
+}
+
+@media (max-width: 768px) {
+	.service-selection {
+		grid-template-columns: 1fr;
+	}
+
+	.tickets-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.contract-field {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+
+	.contract-view {
+		padding: 1.5rem;
+	}
+
+	.nav-tab {
+		padding: 0.8rem 1.2rem;
+		font-size: 0.9rem;
+	}
+
+	.service-card {
+		padding: 1.5rem;
+	}
+}

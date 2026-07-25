@@ -1,0 +1,46 @@
+.email-field {
+	display: flex;
+	flex-direction: column;
+	gap: 0.4em;
+	margin-bottom: 1.2em;
+	text-align: left;
+}
+
+.email-field__label {
+	font-size: 0.85em;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+	opacity: 0.8;
+}
+
+.email-field__error {
+	font-size: 0.8em;
+	color: #e57373;
+}
+
+.email-field__examples {
+	font-size: 0.8em;
+	color: #e57373;
+	margin: 0.2em 0 0;
+	display: flex;
+	flex-direction: column;
+	gap: 0.15em;
+}
+
+.email-field__examples-label {
+	opacity: 0.85;
+}
+
+.email-field__examples-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4em 0.8em;
+}
+
+.email-field__example {
+	font-family: monospace;
+	opacity: 0.9;
+}

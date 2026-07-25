@@ -1,0 +1,335 @@
+{
+	"common": {
+		"appName": "Super-Internet"
+	},
+	"modal": {
+		"ok": "ОК",
+		"yes": "Так",
+		"no": "Ні",
+		"confirm": "Підтвердити",
+		"cancel": "Скасувати",
+		"error": "Помилка",
+		"success": "Успіх"
+	},
+	"errorBoundary": {
+		"title": "Щось пішло не так",
+		"message": "Сталася непередбачена помилка. Спробуйте оновити сторінку.",
+		"reload": "Оновити сторінку"
+	},
+	"auth": {
+		"tabs": {
+			"login": "Вхід",
+			"register": "Реєстрація"
+		},
+		"fields": {
+			"email": "Email",
+			"password": "Пароль",
+			"phone": "Телефон",
+			"fio": "ПІБ",
+			"passwordConfirm": "Підтвердження паролю"
+		},
+		"forgotPassword": "Забув пароль",
+		"submitLogin": "Увійти",
+		"submitRegister": "Зареєструватися",
+		"registrationSuccessTitle": "Успіх",
+		"registrationSuccessMessage": "Реєстрацію завершено! Тепер оберіть послугу."
+	},
+	"recovery": {
+		"title": "Відновлення паролю",
+		"emailHint": "Введіть email - ми надішлемо код підтвердження.",
+		"sendCode": "Надіслати код",
+		"cancel": "Скасувати",
+		"codeHint": "Введіть 6-значний код, надісланий на {{email}}.",
+		"codeLabel": "Код підтвердження",
+		"verifyCode": "Підтвердити код",
+		"resendCode": "Надіслати код повторно",
+		"codeVerifiedHint": "Код підтверджено. Встановіть новий пароль.",
+		"newPasswordLabel": "Новий пароль",
+		"passwordConfirmLabel": "Підтвердження паролю",
+		"resetAndLogin": "Змінити пароль і увійти",
+		"successHint": "Пароль успішно змінено! Виконується вхід...",
+		"passwordsMismatch": "Паролі не співпадають"
+	},
+	"dashboard": {
+		"welcome": "Вітаємо, {{name}}!",
+		"roles": {
+			"client": "Клієнт",
+			"support": "Підтримка",
+			"admin": "Адміністратор"
+		},
+		"logout": "Вийти",
+		"loading": "Завантаження...",
+		"nav": {
+			"status": "Статус послуг",
+			"contract": "Договір",
+			"profile": "Профіль",
+			"support": "Підтримка",
+			"staff": "Персонал",
+			"equipment": "Обладнання",
+			"clients": "Клієнти",
+			"tickets": "Звернення"
+		}
+	},
+	"status": {
+		"pending": "Очікує підключення",
+		"active": "Активна",
+		"debt": "Заборгованість"
+	},
+	"contract": {
+		"statusActive": "Активний",
+		"statusDebt": "Борг",
+		"statusPending": "Очікує підключення",
+		"noContract": "Немає договору",
+		"title": "Договір №{{id}}",
+		"fio": "ПІБ:",
+		"phone": "Телефон:",
+		"email": "Email:",
+		"address": "Адреса:",
+		"serviceType": "Тип послуги:",
+		"equipmentId": "ID обладнання:",
+		"equipmentIdImmutable": "ID обладнання (незмінний):",
+		"contractNumberImmutable": "Номер договору (незмінний):",
+		"status": "Статус:",
+		"edit": "Редагувати договір",
+		"delete": "Видалити договір",
+		"deleteAccount": "Видалити акаунт",
+		"notIssued": "Договір не оформлено",
+		"addressNotSpecified": "Не вказано"
+	},
+	"service": {
+		"internetTitle": "Інтернет",
+		"internetDesc": "Швидкісне та якісне з'єднання",
+		"internetPrice": "300 грн/міс",
+		"internetTvTitle": "Інтернет + Телебачення",
+		"internetTvDesc": "Подвійна вигода!",
+		"internetTvPrice": "450 грн/міс",
+		"currentService": "Поточна послуга",
+		"balance": "Баланс:",
+		"balanceValue": "{{amount}} грн",
+		"nextPayment": "Наступний платіж:",
+		"recurringPayment": "Регулярний платіж",
+		"recurringActive": "Активний",
+		"recurringInactive": "Неактивний",
+		"pay": "Оплатити"
+	},
+	"support": {
+		"chatTitle": "Чат з технічною підтримкою",
+		"noMessagesYet": "Поки що немає повідомлень"
+	},
+	"staff": {
+		"panelTitle": "Керування персоналом",
+		"add": "Додати співробітника",
+		"save": "Зберегти",
+		"cancel": "Скасувати",
+		"fioLabel": "ПІБ співробітника",
+		"passwordLabel": "Пароль",
+		"listTitle": "Співробітники підтримки:",
+		"delete": "Видалити",
+		"deleteConfirmTitle": "Підтвердження",
+		"deleteConfirmMessage": "Видалити цього співробітника?",
+		"deletedMessage": "Співробітника видалено!",
+		"addedMessage": "Співробітника додано!",
+		"defaultSupportName": "Техпідтримка"
+	},
+	"equipment": {
+		"panelTitle": "Моніторинг обладнання",
+		"empty": "Немає підключеного обладнання",
+		"statusOnline": "Онлайн",
+		"statusOffline": "Офлайн",
+		"statusPending": "Очікує",
+		"approve": "Підтвердити",
+		"turnOn": "Увімкнути",
+		"turnOff": "Вимкнути",
+		"tooltip": "Клієнт: {{fio}}\nАдреса: {{address}}\nПослуга: {{service}}\nСтатус: {{status}}",
+		"approveConfirmTitle": "Підтвердження підключення",
+		"approveConfirmMessage": "Підтвердити підключення для {{fio}}?\n\nАдреса: {{address}}\nПослуга: {{service}}",
+		"approvedMessage": "Підключення підтверджено! Клієнт може активувати послугу після оплати.",
+		"statusChangeConfirmTitle": "Зміна статусу обладнання",
+		"statusChangeConfirmMessage": "{{action}} обладнання {{equipmentId}}?\n\nКлієнт: {{fio}}",
+		"turnedOnMessage": "Обладнання увімкнено!",
+		"turnedOffMessage": "Обладнання вимкнено!",
+		"serviceInternet": "Інтернет",
+		"serviceInternetTv": "Інтернет + ТБ"
+	},
+	"clients": {
+		"panelTitle": "Управління клієнтами",
+		"empty": "Немає зареєстрованих клієнтів",
+		"phone": "Телефон: {{phone}}",
+		"balance": "Баланс: {{amount}} грн",
+		"connected": "Підключено",
+		"pending": "Очікує",
+		"noContract": "Без договору",
+		"delete": "Видалити клієнта",
+		"deleteConfirmTitle": "Видалення клієнта",
+		"deleteConfirmMessage": "Видалити клієнта {{fio}}?\n\nВсі дані, включаючи договір та історію, будуть втрачені назавжди!",
+		"deletedMessage": "Клієнта видалено!"
+	},
+	"tickets": {
+		"navLabel": "Звернення",
+		"panelTitle": "Активні звернення",
+		"empty": "Немає активних звернень",
+		"messagesFromClient": "Повідомлень від клієнта: {{count}}",
+		"newMessages": "Нові повідомлення",
+		"activeStatus": "Активне",
+		"closeConfirmTitle": "Закриття звернення",
+		"closeConfirmMessage": "Закрити звернення від {{fio}}? Всі повідомлення будуть видалені.",
+		"closedMessage": "Звернення закрито!",
+		"viewProfile": "Переглянути профіль",
+		"closeTicket": "Закрити звернення",
+		"closeAria": "Закрити чат",
+		"chatWith": "Чат з {{fio}}"
+	},
+	"profile": {
+		"modalTitle": "Профіль клієнта",
+		"close": "Закрити",
+		"statusTab": "Статус послуги",
+		"contractTab": "Договір",
+		"myProfile": "Мій профіль",
+		"save": "Зберегти зміни",
+		"updatedMessage": "Профіль оновлено!",
+		"contractUpdatedMessage": "Договір оновлено!"
+	},
+	"account": {
+		"deleteConfirmTitle": "Видалення акаунта",
+		"deleteConfirmMessage": "Ви впевнені, що хочете видалити акаунт? Всі дані будуть втрачені назавжди!",
+		"deletedMessage": "Акаунт видалено!"
+	},
+	"payment": {
+		"notApprovedTitle": "Увага",
+		"notApprovedMessage": "Очікуйте підтвердження підключення від адміністратора. Оплата буде доступна після активації.",
+		"promptTitle": "Оплата",
+		"promptMessage": "Введіть суму для оплати (грн):",
+		"invalidAmount": "Будь ласка, введіть коректну суму",
+		"recurringPromptTitle": "Регулярний платіж",
+		"recurringPromptMessage": "Бажаєте зробити цей платіж регулярним (щомісячне автоматичне списання)?",
+		"successTitle": "Успіх",
+		"successMessage": "Оплату на суму {{amount}} грн успішно проведено!\n\n",
+		"recurringActivatedLine": "Активовано регулярний платіж.\n",
+		"newBalance": "Ваш новий баланс: {{balance}} грн",
+		"recurringToggledOn": "Регулярний платіж активовано!",
+		"recurringToggledOff": "Регулярний платіж деактивовано!",
+		"chargeDescription": "Оплата послуги, договір {{contractId}}"
+	},
+	"address": {
+		"promptTitle": "Адреса підключення",
+		"promptMessage": "Введіть вашу повну адресу (вулиця, номер будинку, квартира):",
+		"acceptedTitle": "Заявка прийнята",
+		"acceptedMessage": "Послугу успішно обрано!\n\nВаша адреса: {{address}}\n\nОчікуйте підтвердження підключення від адміністратора.",
+		"editTitle": "Редагування договору",
+		"editMessage": "Введіть нову адресу:",
+		"updatedMessage": "Договір оновлено!",
+		"deleteConfirmTitle": "Видалення договору",
+		"deleteConfirmMessage": "Ви впевнені, що хочете видалити договір? Ця дія незворотна.",
+		"deletedMessage": "Договір видалено!",
+		"label": "Адреса",
+		"placeholder": "вул. Шевченка, 15, кв. 3",
+		"requirements": {
+			"cyrillic": "Адреса написана українською",
+			"street": "Тип вулиці (вул. / просп. / пров. / бульв. / площа / майдан)",
+			"number": "Номер будинку (цифра)",
+			"length": "Не менше 15 символів"
+		}
+	},
+	"password": {
+		"requirements": {
+			"length": "Мінімум {{min}} символів",
+			"digit": "Хоча б одна цифра",
+			"uppercase": "Хоча б одна велика буква"
+		}
+	},
+	"chat": {
+		"placeholder": "Введіть повідомлення...",
+		"send": "Надіслати",
+		"autoReply": "Дякуємо за звернення! Наші спеціалісти опрацюють ваш запит найближчим часом."
+	},
+	"email": {
+		"examplesLabel": "Приклади коректного формату:"
+	},
+	"pagination": {
+		"ariaLabel": "Сторінки",
+		"prevAriaLabel": "Попередня сторінка",
+		"nextAriaLabel": "Наступна сторінка",
+		"status": "{{page}} з {{count}}"
+	},
+	"languageSwitcher": {
+		"ariaLabel": "Мова / Language"
+	},
+	"input": {
+		"showPassword": "Показати пароль",
+		"hidePassword": "Сховати пароль"
+	},
+	"errors": {
+		"clientNotFound": "Клієнта не знайдено",
+		"emailTaken": "Користувач з таким email вже існує",
+		"unknownServerError": "Сталася непередбачена помилка під час звернення до сервера",
+		"lockedOutLogin": "Забагато невдалих спроб входу. Спробуйте ще раз через {{seconds}} с.",
+		"invalidCredentials": "Невірний email або пароль",
+		"userNotFoundByEmail": "Користувача з таким email не знайдено",
+		"lockedOutCode": "Забагато невдалих спроб. Спробуйте ще раз через {{seconds}} с.",
+		"invalidCode": "Невірний або прострочений код",
+		"userNotFound": "Користувача не знайдено",
+		"emailSendFailed": "Не вдалося надіслати email з кодом підтвердження",
+		"invalidPaymentAmount": "Сума платежу має бути більшою за 0",
+		"privatBankChargeFailed": "Не вдалося провести платіж через PrivatBank"
+	},
+	"landing": {
+		"menu": {
+			"home": "Головна",
+			"about": "Про нас",
+			"pricing": "Тарифи",
+			"contacts": "Контакти"
+		},
+		"login": "Увійти",
+		"connectNow": "Підключитися зараз",
+		"slides": {
+			"features": {
+				"title": "Неймовірні можливості",
+				"body": "Швидкісний та стабільний інтернет за доступною ціною. Ми гарантуємо якість, надійність та сучасні технології для вашого дому та бізнесу."
+			},
+			"about": {
+				"title": "Ми компанія",
+				"body": "Super Internet — провайдер оптоволоконного швидкісного інтернету. Працюємо чесно та прозоро, забезпечуємо стабільність з’єднання і підтримку 24/7."
+			},
+			"pricing": {
+				"title": "Тарифи",
+				"intro": "Обирайте свій варіант:",
+				"internet": "Інтернет — швидкісне та якісне з’єднання.",
+				"internetTv": "Інтернет + Телебачення — подвійна вигода."
+			},
+			"contacts": {
+				"title": "Контакти",
+				"address": "📍 Адреса: м. Калуш, вул. Січових Стрільців, 15",
+				"email": "📧 Email: bohdan.kruchkevych-ip231@nung.edu.ua",
+				"phone": "📞 Телефон: +380 ХХ ХХХ ХХ ХХ"
+			}
+		}
+	},
+	"validation": {
+		"email": {
+			"required": "Email є обов'язковим",
+			"domainFormat": "Email має закінчуватись на @gmail.com, @ukr.net або подібне",
+			"invalid": "Невірний формат email"
+		},
+		"phone": {
+			"format": "Формат телефону: +380XXXXXXXXX"
+		},
+		"fio": {
+			"format": "Введіть повне ПІБ українською (3 слова з великої літери)"
+		},
+		"password": {
+			"required": "Пароль є обов'язковим",
+			"mismatch": "Паролі не співпадають"
+		},
+		"code": {
+			"length": "Код має складатись з 6 цифр",
+			"digitsOnly": "Код має складатись лише з цифр"
+		},
+		"staffName": {
+			"format": "Введіть ім'я співробітника (мінімум 2 символи)"
+		},
+		"amount": {
+			"positive": "Сума має бути більшою за 0",
+			"maxExceeded": "Сума перевищує допустимий ліміт"
+		}
+	}
+}

@@ -1,0 +1,22 @@
+.badge {
+	display: inline-block;
+	padding: 0.5rem 1rem;
+	border-radius: 20px;
+	font-size: 0.9rem;
+	font-weight: bold;
+}
+
+.badge--active {
+	background: var(--success-color);
+	color: var(--white-color);
+}
+
+.badge--debt {
+	background: var(--error-color);
+	color: var(--white-color);
+}
+
+.badge--pending {
+	background: var(--warning-color);
+	color: rgb(51, 51, 51);
+}
