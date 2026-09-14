@@ -28,8 +28,8 @@ info:
     **ніколи** не повинні потрапляти у відповідь API. Схеми нижче (`PublicClientUser`
     і т.д.) свідомо не містять цих полів.
   contact:
-    name: "<your-username>"
-    url: "https://github.com/<your-username>/Super-Internet"
+    name: "<Super-Internet>"
+    url: "https://vscrm.github.io/Super-Internet/"
   license:
     name: MIT
     url: "https://opensource.org/licenses/MIT"
