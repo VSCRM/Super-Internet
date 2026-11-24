@@ -155,10 +155,24 @@ export const staffNameSchema = z
 	.trim()
 	.min(2, "validation.staffName.format");
 
+/** Mock mode: a name, an email and a password are enough (`phone` is unused there). */
 export const addStaffSchema = z.object({
 	name: staffNameSchema,
 	email: loginEmailSchema,
 	password: passwordSchema,
+	phone: z.string().trim(),
+});
+
+/**
+ * Real backend: a staff account is created through the same endpoint and
+ * validation as a client sign-up, so it needs a three-word full name, a
+ * supported-provider email and a +380 phone.
+ */
+export const addStaffBackendSchema = z.object({
+	name: fioSchema,
+	email: emailSchema,
+	password: passwordSchema,
+	phone: phoneSchema,
 });
 
 export type AddStaffInput = z.infer<typeof addStaffSchema>;

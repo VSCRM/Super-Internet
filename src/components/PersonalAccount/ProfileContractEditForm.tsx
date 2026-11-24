@@ -41,6 +41,32 @@ export function ProfileContractEditForm({
 		return <p style={{ textAlign: "center" }}>{t("contract.notIssued")}</p>;
 	}
 
+	if (!app.capabilities.canEditContract) {
+		const rows: Array<[string, string]> = [
+			[t("auth.fields.fio"), client.contract.fio],
+			[t("auth.fields.phone"), client.contract.phone],
+			[t("auth.fields.email"), client.contract.email],
+			[t("address.label"), client.contract.address],
+			[t("contract.equipmentIdImmutable"), client.contract.equipmentId],
+		];
+		return (
+			<div className={styles["contract-form"]}>
+				<h2 style={{ textAlign: "center", marginBottom: "1.5rem" }}>
+					{t("contract.title", { id: client.contract.id })}
+				</h2>
+				{rows.map(([label, value]) => (
+					<div key={label} className={shared["contract-field"]}>
+						<span>{label}</span>
+						<strong>{value}</strong>
+					</div>
+				))}
+				<p style={{ marginTop: "1rem", color: "var(--gray-color)" }}>
+					{t("profile.contractReadOnlyNotice")}
+				</p>
+			</div>
+		);
+	}
+
 	const handleSave = async (): Promise<void> => {
 		const data = form.validate();
 		if (!data) return;

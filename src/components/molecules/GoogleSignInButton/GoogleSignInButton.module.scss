@@ -1,0 +1,36 @@
+.google-sign-in {
+	margin-top: 1.5rem;
+}
+
+.google-sign-in__divider {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	margin-bottom: 1.25rem;
+	color: var(--gray-color);
+	font-size: 0.85rem;
+	text-transform: uppercase;
+	letter-spacing: 0.1em;
+
+	&::before,
+	&::after {
+		content: "";
+		flex: 1;
+		height: 1px;
+		background: var(--gray-color);
+		opacity: 0.5;
+	}
+}
+
+.google-sign-in__content {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.75rem;
+}
+
+.google-sign-in__icon {
+	width: 1.4em;
+	height: 1.4em;
+	flex-shrink: 0;
+}

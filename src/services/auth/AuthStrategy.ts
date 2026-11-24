@@ -11,10 +11,9 @@ export interface RegisterPayload {
 /**
  * Strategy pattern: the UI layer (AuthScreen, AppContext) depends only on
  * this interface. `LocalAuthStrategy` simulates a session entirely in the
- * browser (Mock mode). `ApiAuthStrategy` is architected for a real backend
- * that issues a JWT inside an HttpOnly cookie - the strategy never reads or
- * stores the token itself, it only asks the browser to send credentials
- * (`withCredentials: true`) and asks the server "who am I" on boot.
+ * browser (Mock mode). `ApiAuthStrategy` talks to the Spring backend, which
+ * answers login/register with `{ token, user }` for an `Authorization: Bearer`
+ * header and resolves "who am I" on boot via `GET /api/auth/me`.
  */
 export interface AuthStrategy {
 	login(email: string, password: string): Promise<Result<AppUser, AppError>>;

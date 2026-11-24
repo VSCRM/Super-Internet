@@ -3,7 +3,7 @@
 <p align="center">
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-strict-blue?logo=typescript" />
   <img alt="React" src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black" />
-  <img alt="Tests" src="https://img.shields.io/badge/tests-70%20passing-brightgreen" />
+  <img alt="Tests" src="https://img.shields.io/badge/tests-112%20passing-brightgreen" />
   <img alt="API docs" src="https://img.shields.io/badge/API%20docs-OpenAPI%203.0-85EA2D?logo=swagger&logoColor=black" />
   <a href="./LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-green" /></a>
 </p>
@@ -31,6 +31,7 @@
     - [Шарування](#шарування)
   - [Швидкий старт](#швидкий-старт)
   - [Змінні середовища](#змінні-середовища)
+  - [Робота з бекендом](#робота-з-бекендом)
   - [Скрипти](#скрипти)
   - [Тестування](#тестування)
   - [Документація API](#документація-api)
@@ -47,19 +48,26 @@
 
 **Клієнт**
 
-- Реєстрація/вхід з real-time Zod-валідацією (email, пароль, телефон)
-- Вибір послуги (Інтернет / Інтернет + ТБ), договір з незмінним ID обладнання
-- Оплата (mock-шлюз або PrivatBank-контракт), регулярні платежі
-- Чат з підтримкою, відновлення пароля через email-код (EmailJS)
+- Реєстрація/вхід з real-time Zod-валідацією (email, пароль, телефон); у режимі бекенду
+  ще й вхід через Google
+- Вибір послуги (Інтернет / Інтернет + ТБ), договір з незмінним ID обладнання. Із бекендом
+  ПІБ і телефон для договору беруться з профілю, а для Google-акаунта (де їх немає) —
+  запитуються при оформленні
+- Оплата (Mock: mock-шлюз або PrivatBank-контракт; з бекендом платіж проводить сам бекенд),
+  регулярні платежі
+- Чат з підтримкою (з бекендом — живий, оновлюється раз на 5 с, без автовідповіді)
+- Відновлення пароля через email-код: Mock — EmailJS, бекенд — код надсилає (або логує) він сам
 
 **Підтримка**
 
 - Черга звернень, відсортована так, щоб непрочитане ніколи не губилось на іншій сторінці
-- Перегляд і редагування профілю/договору клієнта (ID обладнання — тільки читання)
+- Перегляд і редагування договору клієнта (ID обладнання — тільки читання)
+- Підтвердження підключення та зміна статусу обладнання
 
 **Адміністратор**
 
-- Керування персоналом підтримки
+- Керування персоналом підтримки (з бекендом новому співробітнику потрібні телефон і ПІБ
+  з трьох слів), видалення співробітників і клієнтів
 - Моніторинг і підтвердження підключення обладнання (з пагінацією)
 - Список клієнтів (з пагінацією)
 
@@ -68,32 +76,38 @@
 - Захист від брутфорсу на вхід і код відновлення пароля (лок-аут після 5 спроб)
 - ErrorBoundary — рендер-помилка не кладе весь застосунок білим екраном
 - Доступні модалки: focus trap, Escape, `role="dialog"`/`aria-modal`
-- CSRF-заготовка для майбутнього бекенду (double-submit cookie через axios)
+- Режим бекенду: Bearer-JWT, обробка завершення сеансу (`401` → екран входу), зрозумілі
+  повідомлення, коли бекенд недоступний
 - Дві мови (uk/en) з перемикачем в шапці — реально працює, включно з повідомленнями
   валідації форм, не лише зі статичним текстом
 
 ## Технологічний стек
 
-|                      |                                           |
-| -------------------- | ----------------------------------------- |
-| **Мова**             | TypeScript (strict mode, без `any`)       |
-| **UI**               | React 19, SASS Modules (BEM)              |
-| **Валідація**        | Zod                                       |
-| **Локалізація**      | i18next / react-i18next (uk, en)          |
-| **Роутинг**          | React Router                              |
-| **Збірка**           | Vite                                      |
-| **Тести**            | Vitest + Testing Library                  |
-| **Лінт**             | ESLint (typescript-eslint, react-hooks)   |
-| **HTTP-клієнт**      | axios (для майбутнього реального бекенду) |
-| **API-документація** | OpenAPI 3.0 (`public/api/openapi.yaml`)   |
+|                      |                                         |
+| -------------------- | --------------------------------------- |
+| **Мова**             | TypeScript (strict mode, без `any`)     |
+| **UI**               | React 19, SASS Modules (BEM)            |
+| **Валідація**        | Zod                                     |
+| **Локалізація**      | i18next / react-i18next (uk, en)        |
+| **Роутинг**          | React Router                            |
+| **Збірка**           | Vite                                    |
+| **Тести**            | Vitest + Testing Library                |
+| **Лінт**             | ESLint (typescript-eslint, react-hooks) |
+| **HTTP-клієнт**      | axios (Bearer-JWT до Spring-бекенду)    |
+| **API-документація** | OpenAPI 3.0 (`public/api/openapi.yaml`) |
 
 ## Архітектура
 
 ### Патерни проєктування
 
 - **Strategy** — `AuthStrategy` (`LocalAuthStrategy` для Mock-режиму, `ApiAuthStrategy` —
-  готовий контракт для реального бекенду)
-- **Repository** — `UserRepository` (`LocalUserRepository` / `ApiUserRepository`)
+  вхід через Spring-бекенд: Bearer-JWT і Google OAuth2)
+- **Двоє провайдерів стану** — `AppProvider` обирає `LocalAppProvider` (Mock, localStorage)
+  або `BackendAppProvider` (REST) за `VITE_BACKEND_MODE`; обидва віддають один і той самий
+  `AppContextValue`, тож компоненти не знають, що саме активне
+- **Repository** — `UserRepository` (`LocalUserRepository` для Mock-режиму; `ApiUserRepository`
+  — лише заглушка, не використовується: у режимі бекенду `BackendAppProvider` ходить в API
+  напряму через `services/api`)
 - **Factory** — `authStrategyFactory`, `userRepositoryFactory`, `paymentGatewayFactory`,
   `emailServiceFactory`, `passwordRecoveryServiceFactory` — решта коду просить "поточну
   реалізацію", не знаючи, яка саме активна
@@ -122,9 +136,8 @@ npm run dev
 
 `.env` опційний — застосунок повністю працює й без нього (Mock-режим за замовчуванням).
 
-Застосунок відкриється на `http://localhost:5173/Super-Internet/`. Без жодних
-додаткових налаштувань усе працює проти локального Mock-шару (localStorage) — реальний
-бекенд не потрібен.
+Застосунок відкриється на `http://localhost:5173/Super-Internet/`. Без `.env` усе
+працює проти локального Mock-шару (localStorage) — бекенд не потрібен.
 
 **Тестові акаунти** (створюються автоматично при першому запуску, лише в Mock-режимі):
 
@@ -137,12 +150,46 @@ npm run dev
 
 Повний список — у [.env.example](./.env.example). Коротко:
 
-| Змінна                                                     | За замовчуванням | Призначення                                                                                |
-| ---------------------------------------------------------- | ---------------- | ------------------------------------------------------------------------------------------ |
-| `VITE_BACKEND_MODE`                                        | `false`          | `true` → реальний бекенд (`ApiAuthStrategy`/`ApiUserRepository`); `false` → локальний Mock |
-| `VITE_API_BASE_URL`                                        | `/api`           | Базовий URL бекенду (лише при `VITE_BACKEND_MODE=true`)                                    |
-| `VITE_EMAILJS_SERVICE_ID` / `_TEMPLATE_ID` / `_PUBLIC_KEY` | —                | EmailJS для реальних листів відновлення пароля. Без них — фолбек у консоль                 |
-| `VITE_PRIVATBANK_API_BASE_URL` / `_MERCHANT_ID`            | —                | PrivatBank Acquiring. Без них — `MockPaymentGateway`                                       |
+| Змінна                                                     | За замовчуванням        | Призначення                                                                                       |
+| ---------------------------------------------------------- | ----------------------- | ------------------------------------------------------------------------------------------------- |
+| `VITE_BACKEND_MODE`                                        | `false`                 | `true` → бекенд; `false` → локальний Mock                                                         |
+| `VITE_API_BASE_URL`                                        | `/api`                  | Базовий шлях JSON API. `/api` проксіюється Vite на `VITE_BACKEND_ORIGIN` (без CORS)               |
+| `VITE_BACKEND_ORIGIN`                                      | `http://localhost:8080` | Адреса бекенду: ціль проксі та адреса старту входу через Google                                   |
+| `VITE_PRICE_INTERNET` / `VITE_PRICE_INTERNET_TV`           | `250` / `350`           | Ціни тарифів (грн/міс). Бекенд не віддає їх по API — значення мають збігатися з цінами на бекенді |
+| `VITE_EMAILJS_SERVICE_ID` / `_TEMPLATE_ID` / `_PUBLIC_KEY` | —                       | EmailJS для реальних листів відновлення пароля. Без них — фолбек у консоль                        |
+| `VITE_PRIVATBANK_API_BASE_URL` / `_MERCHANT_ID`            | —                       | PrivatBank Acquiring. Без них — `MockPaymentGateway`                                              |
+
+## Робота з бекендом
+
+З `VITE_BACKEND_MODE=true` фронтенд працює з бекендом замість Mock-шару.
+
+**1. Бекенд.** Запустіть бекенд (`./mvnw spring-boot:run`, PostgreSQL піднімається з
+`compose.yaml`). Важливо для входу через Google:
+
+- `FRONTEND_URL=http://localhost:5173/Super-Internet` — **з префіксом `/Super-Internet`**:
+  бекенд повертає браузер на `FRONTEND_URL + /oauth-callback`;
+- у Google Cloud Console дозволений redirect URI `http://localhost:8080/login/oauth2/code/google`.
+
+**2. Фронтенд.** `cp .env.example .env` (там `VITE_BACKEND_MODE=true`), `npm install`,
+`npm run dev`, відкрити `http://localhost:5173/Super-Internet/`.
+
+**Як це влаштовано**
+
+- Запити йдуть на `/api/...` і проксіюються Vite на `VITE_BACKEND_ORIGIN`. Якщо бекенд не
+  запущений, проксі відповідає `502` — застосунок показує зрозуміле повідомлення про це.
+- Авторизація — Bearer-JWT: `POST /auth/login|register` повертає `{ token, user }`, токен
+  лежить у `localStorage` й додається в `Authorization`; `GET /auth/me` відновлює сесію;
+  виходу на сервері немає (токен просто забувається). При `401` застосунок повертає на вхід.
+- Вхід через Google: кнопка робить перехід на `<бекенд>/oauth2/authorization/google`; бекенд
+  повертає на `/oauth-callback#token=…` ([OAuthCallbackPage](./src/pages/OAuthCallbackPage.tsx)),
+  яка забирає токен із фрагмента, прибирає його з адресного рядка й веде в кабінет. Помилка
+  Google → `/login?error=google` → форма входу з повідомленням. У dev-режимі Vite сам
+  перенаправляє `/oauth-callback` і `/login` під `/Super-Internet`, якщо в `FRONTEND_URL`
+  префікс забули.
+- Дані клієнта складаються з кількох ендпоінтів (`/auth/me`, `/contracts/me`, `/chat/messages`);
+  для підтримки й адміна — з `/users`, `/contracts`, `/chat/conversations`. Стан оновлюється
+  опитуванням раз на 5 с (баланс, схвалення, нові повідомлення).
+- У режимі бекенду немає автовідповіді в чаті; платежі проводить бекенд (свій шлюз).
 
 ## Скрипти
 
@@ -162,11 +209,14 @@ npm run dev
 
 ## Тестування
 
-**70 тестів** (Vitest + Testing Library), зосереджені на бізнес-логічному шарі й
+**112 тестів** (Vitest + Testing Library), зосереджені на бізнес-логічному шарі й
 критичних UI-регресіях:
 
 - Сервісний шар: auth-стратегії, відновлення пароля з лок-аутом, платіжний шлюз,
   санітизація, Zod-схеми, хешування паролів, rate-limiter
+- Інтеграція з бекендом (HTTP підмінюється на рівні axios-адаптера): Bearer-авторизація,
+  форми запитів до всіх ендпоінтів, мапінг DTO та помилок, склеювання списків для персоналу,
+  відновлення пароля, колбек Google та кнопка входу
 - Компонентні регресії: наприклад `Header.test.tsx` — перемикання мови в лендинг-шапці
   реально змінює текст (і перемикається назад), а сам перемикач не сидить усередині
   ряду навігації — саме ця пара речей одного разу ламалась, тест написаний, щоб це не
@@ -182,11 +232,10 @@ UI-шар поза цими сценаріями (окремі форми, па�
 
 ## Документація API
 
-`public/api/openapi.yaml` — специфікація OpenAPI 3.0 (валідована `openapi-spec-validator`),
-що описує точний контракт бекенду, який очікує фронтенд у `VITE_BACKEND_MODE=true`
-(зчитано напряму з коду `ApiAuthStrategy`/`UserRepository`, а не вигадано окремо).
-Бекенд ще не реалізований — ця специфікація є контрактом для розробки бекенду, не
-описом того, що вже працює.
+`public/api/openapi.yaml` — специфікація OpenAPI 3.0, написана на ранньому етапі як чернетка
+контракту (cookie-сесія). **Вона застаріла:** бекенд використовує Bearer-JWT, а його
+актуальний контракт — у Swagger бекенду (`SWAGGER_ENABLED=true`, `/swagger-ui.html`).
+Файл лишено як історичну довідку.
 
 Файли лежать у `public/api/` (не в окремій папці `docs/`), тому Vite копіює їх у збірку
 як є, і після `npm run deploy` вони автоматично публікуються на GitHub Pages разом з
@@ -229,11 +278,24 @@ super-internet/
 ├── src/
 │   ├── __tests__/
 │   │   ├── components/
+│   │   │   ├── GoogleSignInButton.test.tsx
 │   │   │   ├── Header.test.tsx
 │   │   │   └── atoms.test.tsx
+│   │   ├── api/
+│   │   │   ├── apiAuth.test.ts
+│   │   │   ├── apiPasswordRecovery.test.ts
+│   │   │   ├── backendApi.test.ts
+│   │   │   ├── httpStub.ts
+│   │   │   ├── mappers.test.ts
+│   │   │   └── staffView.test.ts
+│   │   ├── context/
+│   │   │   └── capabilities.test.ts
 │   │   ├── hooks/
 │   │   │   └── useZodForm.test.tsx
+│   │   ├── pages/
+│   │   │   └── OAuthCallbackPage.test.tsx
 │   │   ├── schemas/
+│   │   │   ├── addStaff.test.ts
 │   │   │   ├── auth.schema.test.ts
 │   │   │   └── profile.schema.test.ts
 │   │   ├── services/
@@ -314,6 +376,9 @@ super-internet/
 │   │   │       ├── ToggleSwitch.module.scss
 │   │   │       └── ToggleSwitch.tsx
 │   │   ├── molecules/
+│   │   │   ├── GoogleSignInButton/
+│   │   │   │   ├── GoogleSignInButton.module.scss
+│   │   │   │   └── GoogleSignInButton.tsx
 │   │   │   ├── AddressField/
 │   │   │   │   ├── AddressField.module.scss
 │   │   │   │   ├── AddressField.tsx
@@ -355,6 +420,9 @@ super-internet/
 │   │   └── SliderLayer.tsx
 │   ├── context/
 │   │   ├── AppContext.tsx
+│   │   ├── BackendAppProvider.tsx
+│   │   ├── LocalAppProvider.tsx
+│   │   ├── appContextCore.ts
 │   │   ├── ModalContext.module.scss
 │   │   ├── ModalContext.tsx
 │   │   ├── contractFactory.ts
@@ -381,10 +449,20 @@ super-internet/
 │   │   └── index.ts
 │   ├── pages/
 │   │   ├── MainPage.tsx
+│   │   ├── OAuthCallbackPage.tsx
 │   │   └── PersonalAccountPage.tsx
 │   ├── services/
+│   │   ├── api/
+│   │   │   ├── apiClient.ts
+│   │   │   ├── backendApi.ts
+│   │   │   ├── backendSession.ts
+│   │   │   ├── dto.ts
+│   │   │   ├── mappers.ts
+│   │   │   ├── staffView.ts
+│   │   │   └── tokenStore.ts
 │   │   ├── auth/
 │   │   │   ├── ApiAuthStrategy.ts
+│   │   │   ├── ApiPasswordRecoveryService.ts
 │   │   │   ├── AuthStrategy.ts
 │   │   │   ├── LocalAuthStrategy.ts
 │   │   │   ├── PasswordRecoveryService.ts
@@ -448,12 +526,13 @@ super-internet/
 
 - Паролі: PBKDF2-SHA256, 100 000 ітерацій, унікальна сіль на користувача,
   timing-safe порівняння при перевірці
-- Сесія: HttpOnly-cookie (архітектура готова до JWT); токен ніколи не читається й не
-  зберігається в JS-коді
-- CSRF: double-submit cookie підключено на рівні axios (`ApiAuthStrategy`) — активується,
-  щойно бекенд почне видавати `XSRF-TOKEN`
+- Сесія (режим бекенду): Bearer-JWT у `localStorage` — бекенд не ставить cookie. Це означає,
+  що XSS міг би його прочитати, тому всі текстові поля санітизуються, а токен живе лише
+  годину (без refresh). Токен із Google-входу приходить у фрагменті URL (`#token=`), тож не
+  потрапляє в логи серверів, і одразу прибирається з адресного рядка й історії
+- CSRF: не потрібен — авторизація через заголовок `Authorization`, а не cookie
 - Брутфорс: лок-аут на 60с після 5 невдалих спроб входу чи введення коду відновлення
-  (client-side speed bump для Mock-режиму; **реальний бекенд має форсувати це незалежно**)
+  (client-side speed bump для Mock-режиму; **бекенд має форсувати це незалежно**)
 - Санітизація всіх текстових полів (`shared/lib/sanitize.ts`) перед збереженням
 - `npm audit`: 0 відомих вразливостей на момент останньої перевірки
 

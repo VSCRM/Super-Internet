@@ -1,5 +1,6 @@
 import type { ReactElement } from "react";
 import { useTranslation } from "react-i18next";
+import { useApp } from "../../context/AppContext";
 import type { ClientUser } from "../../types/models";
 import { SERVICE_NAMES } from "../../types/models";
 import { Button } from "../atoms/Button/Button";
@@ -31,6 +32,11 @@ export function ClientContractTab({
 	onDeleteAccount,
 }: ClientContractTabProps): ReactElement {
 	const { t } = useTranslation();
+	const { capabilities } = useApp();
+	const hasActions =
+		capabilities.canEditContract ||
+		capabilities.canDeleteContract ||
+		capabilities.canDeleteAccounts;
 
 	if (!client.contract) {
 		return (
@@ -78,28 +84,36 @@ export function ClientContractTab({
 				</div>
 			</div>
 
-			<div className={styles["contract-actions"]}>
-				<Button
-					className={styles["contract-actions__button"]}
-					onClick={onEditAddress}
-				>
-					{t("contract.edit")}
-				</Button>
-				<Button
-					variant="secondary"
-					className={styles["contract-actions__button"]}
-					onClick={onDeleteContract}
-				>
-					{t("contract.delete")}
-				</Button>
-				<Button
-					variant="danger"
-					className={styles["contract-actions__button"]}
-					onClick={onDeleteAccount}
-				>
-					{t("contract.deleteAccount")}
-				</Button>
-			</div>
+			{hasActions && (
+				<div className={styles["contract-actions"]}>
+					{capabilities.canEditContract && (
+						<Button
+							className={styles["contract-actions__button"]}
+							onClick={onEditAddress}
+						>
+							{t("contract.edit")}
+						</Button>
+					)}
+					{capabilities.canDeleteContract && (
+						<Button
+							variant="secondary"
+							className={styles["contract-actions__button"]}
+							onClick={onDeleteContract}
+						>
+							{t("contract.delete")}
+						</Button>
+					)}
+					{capabilities.canDeleteAccounts && (
+						<Button
+							variant="danger"
+							className={styles["contract-actions__button"]}
+							onClick={onDeleteAccount}
+						>
+							{t("contract.deleteAccount")}
+						</Button>
+					)}
+				</div>
+			)}
 		</div>
 	);
 }

@@ -8,11 +8,11 @@ export function useAccountDeletionAction(
 	client: ClientUser
 ): () => Promise<boolean> {
 	const { deleteUser } = useApp();
-	const { runVoid } = useConfirmedAction();
+	const { runResult } = useConfirmedAction();
 	const { t } = useTranslation();
 
 	return () =>
-		runVoid({
+		runResult({
 			confirmTitle: t("account.deleteConfirmTitle"),
 			confirmMessage: t("account.deleteConfirmMessage"),
 			successMessage: t("account.deletedMessage"),

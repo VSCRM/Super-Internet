@@ -23,13 +23,25 @@ function displayName(user: AppUser): string {
 	return user.email;
 }
 
+/** What the recovery UI needs; implemented by the Mock service and by `ApiPasswordRecoveryService`. */
+export interface PasswordRecovery {
+	requestCode(email: string): Promise<Result<void, AppError>>;
+	verifyCode(email: string, code: string): Promise<Result<void, AppError>>;
+	/** Verifies the code, sets the new password and starts a session (auto-login). */
+	resetPasswordAndLogin(
+		email: string,
+		code: string,
+		newPassword: string
+	): Promise<Result<AppUser, AppError>>;
+}
+
 /**
  * Encapsulates the full password-recovery flow as a single cohesive service
  * (Single Responsibility), independent from UI state. The recovery code and
  * its expiry are persisted on the user record via the repository so the
  * flow survives a page reload between steps.
  */
-export class PasswordRecoveryService {
+export class PasswordRecoveryService implements PasswordRecovery {
 	private readonly userRepository: UserRepository;
 	private readonly emailService: EmailService;
 	// A 6-digit code is only 1,000,000 combinations - without a lockout an

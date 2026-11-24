@@ -1,99 +1,78 @@
-import axios from "axios";
 import type { AppUser, ClientUser } from "../../types/models";
 import type { AppError, Result } from "../../shared/lib/result";
-import { appError, failure, success } from "../../shared/lib/result";
-import { env } from "../../shared/config/env";
-import i18n from "../../i18n";
+import { failure, success } from "../../shared/lib/result";
+import { backendApi } from "../api/backendApi";
+import { fetchCurrentUser, hydrateUser } from "../api/backendSession";
+import { clearToken, readToken, writeToken } from "../api/tokenStore";
+import type { AuthDto } from "../api/dto";
 import type { AuthStrategy, RegisterPayload } from "./AuthStrategy";
 
-const apiClient = axios.create({
-	baseURL: env.apiBaseUrl,
-	// Required so the browser sends/receives the HttpOnly session cookie set
-	// by the server on `/auth/login`. The JWT itself is never visible to this
-	// code - it lives only in the cookie jar managed by the browser.
-	withCredentials: true,
-	// Double-submit-cookie CSRF protection: the backend is expected to set a
-	// separate, readable `XSRF-TOKEN` cookie (NOT HttpOnly - the whole point
-	// is that JS can read it back). Axios automatically echoes its value in
-	// the `X-XSRF-TOKEN` header on every request, and the server rejects any
-	// state-changing request where the header doesn't match the cookie. This
-	// is required even though the session cookie is HttpOnly and SameSite,
-	// because relying on SameSite alone is not a complete CSRF defense
-	// (e.g. top-level navigations, older browsers, some cross-site GETs).
-	xsrfCookieName: "XSRF-TOKEN",
-	xsrfHeaderName: "X-XSRF-TOKEN",
-});
-
-function toAppError(error: unknown): AppError {
-	if (axios.isAxiosError(error)) {
-		const message =
-			(error.response?.data as { message?: string } | undefined)?.message ??
-			error.message;
-		return appError(`HTTP_${error.response?.status ?? "NETWORK"}`, message);
-	}
-	return appError("UNKNOWN", i18n.t("errors.unknownServerError"));
+/**
+ * Turns a successful `{ token, user }` response into a session: stores the
+ * token, then loads whatever else the UI needs for that user.
+ */
+async function startSession(auth: AuthDto): Promise<Result<AppUser, AppError>> {
+	writeToken(auth.token);
+	const user = await hydrateUser(auth.user);
+	if (!user.ok) clearToken();
+	return user;
 }
 
 /**
- * Production authentication strategy. The backend contract this strategy
- * expects:
- *  - POST /auth/login        { email, password }  -> sets HttpOnly cookie, returns AppUser
- *  - POST /auth/register     RegisterPayload       -> sets HttpOnly cookie, returns ClientUser
- *  - POST /auth/logout       -> clears the cookie server-side
- *  - GET  /auth/session      -> returns the current AppUser or 401
+ * Real-backend authentication (Spring Boot, stateless JWT).
  *
- * No token is ever read, stored, or attached to headers manually - the
- * browser does that automatically for `withCredentials` requests, which is
- * exactly what makes the HttpOnly approach resistant to XSS-based token theft.
+ * Contract with the backend:
+ *  - POST /api/auth/login     { email, password }              -> { token, user }
+ *  - POST /api/auth/register  { email, phone, fio, password }  -> { token, user }
+ *  - GET  /api/auth/me        (Authorization: Bearer <token>)  -> user, or 401
+ *  - Google: browser navigates to <backend>/oauth2/authorization/google and
+ *    comes back to /oauth-callback#token=<jwt> (see OAuthCallbackPage).
+ *
+ * There is no logout endpoint: a JWT is stateless, so logging out simply
+ * means forgetting the token.
  */
 export class ApiAuthStrategy implements AuthStrategy {
 	public async login(
 		email: string,
 		password: string
 	): Promise<Result<AppUser, AppError>> {
-		try {
-			const response = await apiClient.post<AppUser>("/auth/login", {
-				email,
-				password,
-			});
-			return success(response.data);
-		} catch (error) {
-			return failure(toAppError(error));
-		}
+		const response = await backendApi.login(email.trim(), password);
+		if (!response.ok) return failure(response.error);
+		return startSession(response.value);
 	}
 
 	public async register(
 		payload: RegisterPayload
 	): Promise<Result<ClientUser, AppError>> {
-		try {
-			const response = await apiClient.post<ClientUser>(
-				"/auth/register",
-				payload
-			);
-			return success(response.data);
-		} catch (error) {
-			return failure(toAppError(error));
-		}
+		const response = await backendApi.register({
+			email: payload.email.trim(),
+			phone: payload.phone.trim(),
+			fio: payload.fio.trim(),
+			password: payload.password,
+		});
+		if (!response.ok) return failure(response.error);
+
+		const user = await startSession(response.value);
+		if (!user.ok) return failure(user.error);
+		return success(user.value as ClientUser);
 	}
 
 	public async logout(): Promise<Result<void, AppError>> {
-		try {
-			await apiClient.post("/auth/logout");
-			return success(undefined);
-		} catch (error) {
-			return failure(toAppError(error));
-		}
+		clearToken();
+		return success(undefined);
 	}
 
 	public async getSession(): Promise<Result<AppUser | null, AppError>> {
-		try {
-			const response = await apiClient.get<AppUser>("/auth/session");
-			return success(response.data);
-		} catch (error) {
-			if (axios.isAxiosError(error) && error.response?.status === 401) {
-				return success(null);
-			}
-			return failure(toAppError(error));
+		if (!readToken()) return success(null);
+
+		const user = await fetchCurrentUser();
+		if (user.ok) return user;
+
+		// 401 / 403: the token is expired or no longer valid - not an error to show, just "logged out".
+		if (user.error.code === "HTTP_401" || user.error.code === "HTTP_403") {
+			clearToken();
+			return success(null);
 		}
+		return failure(user.error);
 	}
 }

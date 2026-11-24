@@ -32,7 +32,11 @@
 		"submitLogin": "Log in",
 		"submitRegister": "Sign up",
 		"registrationSuccessTitle": "Success",
-		"registrationSuccessMessage": "Registration complete! Now choose a service."
+		"registrationSuccessMessage": "Registration complete! Now choose a service.",
+		"google": "Sign in with Google",
+		"orDivider": "or",
+		"googleFailed": "Google sign-in failed. Please try again.",
+		"googleSigningIn": "Signing you in with Google…"
 	},
 	"recovery": {
 		"title": "Password recovery",
@@ -94,15 +98,20 @@
 		"delete": "Delete contract",
 		"deleteAccount": "Delete account",
 		"notIssued": "No contract issued",
-		"addressNotSpecified": "Not specified"
+		"addressNotSpecified": "Not specified",
+		"fioPromptTitle": "Full name for the contract",
+		"fioPromptMessage": "Enter your full name (three Ukrainian words); it will be written into the contract.",
+		"fioPlaceholder": "Іванов Іван Іванович",
+		"phonePromptTitle": "Phone for the contract",
+		"phonePromptMessage": "Enter a phone number like +380XXXXXXXXX."
 	},
 	"service": {
 		"internetTitle": "Internet",
 		"internetDesc": "Fast and reliable connection",
-		"internetPrice": "300 UAH/mo",
+		"internetPrice": "{{price}} UAH/mo",
 		"internetTvTitle": "Internet + TV",
 		"internetTvDesc": "Double the value!",
-		"internetTvPrice": "450 UAH/mo",
+		"internetTvPrice": "{{price}} UAH/mo",
 		"currentService": "Current service",
 		"balance": "Balance:",
 		"balanceValue": "{{amount}} UAH",
@@ -177,7 +186,8 @@
 		"viewProfile": "View profile",
 		"closeTicket": "Close ticket",
 		"closeAria": "Close chat",
-		"chatWith": "Chat with {{fio}}"
+		"chatWith": "Chat with {{fio}}",
+		"lastMessage": "Last message: {{text}}"
 	},
 	"profile": {
 		"modalTitle": "Client profile",
@@ -187,7 +197,9 @@
 		"myProfile": "My profile",
 		"save": "Save changes",
 		"updatedMessage": "Profile updated!",
-		"contractUpdatedMessage": "Contract updated!"
+		"contractUpdatedMessage": "Contract updated!",
+		"readOnlyNotice": "Profile editing is not available yet.",
+		"contractReadOnlyNotice": "Contract editing is not available yet."
 	},
 	"account": {
 		"deleteConfirmTitle": "Delete account",
@@ -270,7 +282,14 @@
 		"userNotFound": "User not found",
 		"emailSendFailed": "Failed to send the verification code email",
 		"invalidPaymentAmount": "The payment amount must be greater than 0",
-		"privatBankChargeFailed": "Failed to process the payment via PrivatBank"
+		"privatBankChargeFailed": "Failed to process the payment via PrivatBank",
+		"networkError": "Cannot reach the server. Check your internet connection.",
+		"backendUnavailable": "The server is unavailable. Make sure the backend is running (default http://localhost:8080).",
+		"sessionExpired": "Your session has ended. Please sign in again.",
+		"forbidden": "You do not have permission to do this",
+		"contractExists": "This account already has a contract",
+		"notSupportedByBackend": "This action is not available on the server yet",
+		"phoneRequired": "Enter a phone number"
 	},
 	"landing": {
 		"menu": {

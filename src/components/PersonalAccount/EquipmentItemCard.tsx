@@ -53,7 +53,7 @@ export function EquipmentItemCard({
 		>
 			<strong>{client.contract?.equipmentId}</strong>
 			<br />
-			<small>{client.fio}</small>
+			<small>{client.fio || client.email}</small>
 			<br />
 			<span className={styles["equipment-status-badge"]}>
 				<Badge variant={STATUS_BADGE_VARIANTS[status]}>

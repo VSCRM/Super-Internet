@@ -3,7 +3,10 @@ import type { FormEvent, ReactElement } from "react";
 import { useTranslation } from "react-i18next";
 import { useApp } from "../../context/AppContext";
 import { useModal } from "../../context/ModalContext";
-import { addStaffSchema } from "../../shared/schemas/auth.schema";
+import {
+	addStaffBackendSchema,
+	addStaffSchema,
+} from "../../shared/schemas/auth.schema";
 import { useZodForm } from "../../hooks/useZodForm";
 import { isFailure } from "../../shared/lib/result";
 import { Button } from "../atoms/Button/Button";
@@ -18,15 +21,19 @@ export interface AddStaffFormProps {
 
 /** Single responsibility: validated form for creating a new support-staff account. */
 export function AddStaffForm({ onDone }: AddStaffFormProps): ReactElement {
-	const { addStaff } = useApp();
+	const { addStaff, capabilities } = useApp();
 	const modal = useModal();
 	const { t } = useTranslation();
 	const [isSubmitting, setIsSubmitting] = useState(false);
-	const form = useZodForm(addStaffSchema, {
-		name: "",
-		email: "",
-		password: "",
-	});
+	const form = useZodForm(
+		capabilities.isBackend ? addStaffBackendSchema : addStaffSchema,
+		{
+			name: "",
+			email: "",
+			password: "",
+			phone: "",
+		}
+	);
 
 	const handleSubmit = async (event: FormEvent): Promise<void> => {
 		event.preventDefault();
@@ -34,7 +41,12 @@ export function AddStaffForm({ onDone }: AddStaffFormProps): ReactElement {
 		if (!data) return;
 
 		setIsSubmitting(true);
-		const result = await addStaff(data.email, data.password, data.name);
+		const result = await addStaff(
+			data.email,
+			data.password,
+			data.name,
+			data.phone
+		);
 		setIsSubmitting(false);
 
 		if (isFailure(result)) {
@@ -70,6 +82,19 @@ export function AddStaffForm({ onDone }: AddStaffFormProps): ReactElement {
 				onChange={(e) => form.setValue("email", e.target.value)}
 				onBlur={() => form.touchField("email")}
 			/>
+			{capabilities.isBackend && (
+				<FormField
+					id="staffPhone"
+					label={t("auth.fields.phone")}
+					type="tel"
+					placeholder="+380XXXXXXXXX"
+					value={form.values.phone}
+					errorMessage={form.errors.phone}
+					touched={form.touched.phone}
+					onChange={(e) => form.setValue("phone", e.target.value)}
+					onBlur={() => form.touchField("phone")}
+				/>
+			)}
 			<PasswordField
 				id="staffPassword"
 				label={t("staff.passwordLabel")}

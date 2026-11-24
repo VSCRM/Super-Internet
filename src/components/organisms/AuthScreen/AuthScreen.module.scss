@@ -66,6 +66,12 @@
 	border-color: var(--purple-color);
 }
 
+.auth-screen__error {
+	margin-top: 1rem;
+	color: #ff8a80;
+	text-align: center;
+}
+
 .auth-screen__form {
 	animation: auth-screen-slide-in 0.3s ease;
 }

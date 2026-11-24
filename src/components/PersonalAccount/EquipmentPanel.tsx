@@ -18,7 +18,7 @@ function resolveEquipmentStatus(client: ClientUser): EquipmentStatus {
 /** Single responsibility: approve pending connections and toggle equipment on/off (paginated). */
 export function EquipmentPanel(): ReactElement {
 	const { users, approveConnection, setEquipmentStatus } = useApp();
-	const { runVoid } = useConfirmedAction();
+	const { runResult } = useConfirmedAction();
 	const { t } = useTranslation();
 	const clients = users.filter(
 		(u): u is ClientUser => u.role === "client" && !!u.contract
@@ -32,7 +32,7 @@ export function EquipmentPanel(): ReactElement {
 				? t("equipment.serviceInternet")
 				: t("equipment.serviceInternetTv");
 
-		return runVoid({
+		return runResult({
 			confirmTitle: t("equipment.approveConfirmTitle"),
 			confirmMessage: t("equipment.approveConfirmMessage", {
 				fio: client.fio,
@@ -52,7 +52,7 @@ export function EquipmentPanel(): ReactElement {
 		const actionLabel =
 			newStatus === "online" ? t("equipment.turnOn") : t("equipment.turnOff");
 
-		return runVoid({
+		return runResult({
 			confirmTitle: t("equipment.statusChangeConfirmTitle"),
 			confirmMessage: t("equipment.statusChangeConfirmMessage", {
 				action: actionLabel,

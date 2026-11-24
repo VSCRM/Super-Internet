@@ -22,7 +22,7 @@ interface ProfileEditFormProps {
 export function ProfileEditForm({
 	client,
 }: ProfileEditFormProps): ReactElement {
-	const { updateProfile } = useApp();
+	const { updateProfile, capabilities } = useApp();
 	const modal = useModal();
 	const { t } = useTranslation();
 
@@ -47,6 +47,38 @@ export function ProfileEditForm({
 			"success"
 		);
 	};
+
+	if (!capabilities.canEditProfile) {
+		return (
+			<div className="service-card">
+				<h3>{t("profile.myProfile")}</h3>
+
+				<div className="contract-field">
+					<span>{t("auth.fields.email")}</span>
+					<span>{client.email}</span>
+				</div>
+				<div className="contract-field">
+					<span>{t("auth.fields.fio")}</span>
+					<span>{client.fio || "—"}</span>
+				</div>
+				<div className="contract-field">
+					<span>{t("auth.fields.phone")}</span>
+					<span>{client.phone || "—"}</span>
+				</div>
+				<div className="contract-field">
+					<span>{t("contract.contractNumberImmutable")}</span>
+					<span>{client.contract?.id ?? "—"}</span>
+				</div>
+				<div className="contract-field">
+					<span>{t("contract.equipmentIdImmutable")}</span>
+					<span>{client.contract?.equipmentId ?? "—"}</span>
+				</div>
+				<p style={{ marginTop: "1rem", color: "var(--gray-color)" }}>
+					{t("profile.readOnlyNotice")}
+				</p>
+			</div>
+		);
+	}
 
 	return (
 		<div className="service-card">

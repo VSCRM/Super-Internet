@@ -9,10 +9,25 @@ function readBoolean(value: string | undefined, fallback: boolean): boolean {
 	return value === "true" || value === "1";
 }
 
+function readPrice(value: string | undefined, fallback: number): number {
+	const parsed = Number(value);
+	return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
 export interface AppEnv {
-	/** When true, the app talks to a real backend via ApiAuthStrategy/ApiUserRepository. */
+	/** When true, the app talks to the real Spring backend instead of the local Mock layer. */
 	readonly backendMode: boolean;
+	/** Base path of the JSON API. Relative (`/api`) goes through the Vite dev proxy. */
 	readonly apiBaseUrl: string;
+	/**
+	 * Origin of the backend, used ONLY for the browser redirect that starts
+	 * the Google sign-in (`<origin>/oauth2/authorization/google`). That is a
+	 * full-page navigation, not an XHR, so it cannot use `apiBaseUrl`.
+	 */
+	readonly backendOrigin: string;
+	/** Monthly tariff prices in UAH. Must match the tariff prices used by the backend. */
+	readonly priceInternet: number;
+	readonly priceInternetTv: number;
 	readonly emailJsServiceId: string | null;
 	readonly emailJsTemplateId: string | null;
 	readonly emailJsPublicKey: string | null;
@@ -28,6 +43,11 @@ function readString(value: string | undefined): string | null {
 export const env: AppEnv = {
 	backendMode: readBoolean(import.meta.env.VITE_BACKEND_MODE, false),
 	apiBaseUrl: import.meta.env.VITE_API_BASE_URL?.trim() || "/api",
+	backendOrigin: (
+		import.meta.env.VITE_BACKEND_ORIGIN?.trim() || "http://localhost:8080"
+	).replace(/\/+$/, ""),
+	priceInternet: readPrice(import.meta.env.VITE_PRICE_INTERNET, 250),
+	priceInternetTv: readPrice(import.meta.env.VITE_PRICE_INTERNET_TV, 350),
 	emailJsServiceId: readString(import.meta.env.VITE_EMAILJS_SERVICE_ID),
 	emailJsTemplateId: readString(import.meta.env.VITE_EMAILJS_TEMPLATE_ID),
 	emailJsPublicKey: readString(import.meta.env.VITE_EMAILJS_PUBLIC_KEY),
@@ -36,6 +56,11 @@ export const env: AppEnv = {
 	),
 	privatBankMerchantId: readString(import.meta.env.VITE_PRIVATBANK_MERCHANT_ID),
 };
+
+/** Full URL that starts the Google OAuth2 handshake on the backend. */
+export function googleLoginUrl(): string {
+	return `${env.backendOrigin}/oauth2/authorization/google`;
+}
 
 export function isEmailJsConfigured(): boolean {
 	return Boolean(

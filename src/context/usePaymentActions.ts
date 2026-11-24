@@ -12,7 +12,9 @@ export interface PaymentActions {
 		amount: number,
 		isRecurring: boolean
 	) => Promise<Result<number, AppError>>;
-	toggleRecurringPayment: (clientId: number) => Promise<boolean>;
+	toggleRecurringPayment: (
+		clientId: number
+	) => Promise<Result<boolean, AppError>>;
 }
 
 export function usePaymentActions(
@@ -66,13 +68,13 @@ export function usePaymentActions(
 	);
 
 	const toggleRecurringPayment = useCallback(
-		async (clientId: number): Promise<boolean> => {
+		async (clientId: number): Promise<Result<boolean, AppError>> => {
 			let nextValue = false;
-			await updateClient(clientId, (client) => {
+			const result = await updateClient(clientId, (client) => {
 				nextValue = !client.isRecurring;
 				return { ...client, isRecurring: nextValue };
 			});
-			return nextValue;
+			return result.ok ? success(nextValue) : failure(result.error);
 		},
 		[updateClient]
 	);

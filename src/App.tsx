@@ -1,5 +1,11 @@
 import { lazy, Suspense } from "react";
-import { BrowserRouter, Route, Routes } from "react-router";
+import {
+	BrowserRouter,
+	Navigate,
+	Route,
+	Routes,
+	useLocation,
+} from "react-router";
 import type { ReactElement } from "react";
 import { ErrorBoundary } from "./components/ErrorBoundary/ErrorBoundary";
 
@@ -15,7 +21,19 @@ const PersonalAccountPage = lazy(() =>
 	}))
 );
 
+const OAuthCallbackPage = lazy(() =>
+	import("./pages/OAuthCallbackPage").then((module) => ({
+		default: module.OAuthCallbackPage,
+	}))
+);
+
 const BASE = import.meta.env.BASE_URL;
+
+/** The backend redirects a failed Google sign-in to `/login?error=google`; the login form lives on /account. */
+function LoginRedirect(): ReactElement {
+	const { search } = useLocation();
+	return <Navigate to={{ pathname: "/account", search }} replace />;
+}
 
 function RouteFallback(): ReactElement {
 	return (
@@ -34,6 +52,8 @@ export default function App(): ReactElement {
 					<Routes>
 						<Route path="/" element={<MainPage />} />
 						<Route path="/account" element={<PersonalAccountPage />} />
+						<Route path="/oauth-callback" element={<OAuthCallbackPage />} />
+						<Route path="/login" element={<LoginRedirect />} />
 					</Routes>
 				</Suspense>
 			</ErrorBoundary>

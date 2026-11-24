@@ -9,16 +9,20 @@ import shared from "./dashboardShared.module.scss";
 
 /** Composition root for the support agent's personal account: ticket queue + the active chat overlay. */
 export function SupportDashboard(): ReactElement {
-	const { users } = useApp();
+	const { users, capabilities } = useApp();
 	const { t } = useTranslation();
 	const [activeClientId, setActiveClientId] = useState<number | null>(null);
 
 	// Only clients who sent at least one message TO support (exclude auto-replies).
+	// The backend lists only real conversations, so there any message counts.
 	// Unread-first, so a new message never gets buried below older, already-read tickets.
 	const tickets = users
 		.filter(
 			(u): u is ClientUser =>
-				u.role === "client" && u.messages.some((m) => m.from !== "support")
+				u.role === "client" &&
+				(capabilities.isBackend
+					? u.messages.length > 0
+					: u.messages.some((m) => m.from !== "support"))
 		)
 		.sort((a, b) => b.unreadMessages - a.unreadMessages);
 

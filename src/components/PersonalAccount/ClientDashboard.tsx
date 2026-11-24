@@ -46,20 +46,20 @@ export function ClientDashboard({
 		if (next === "support") void app.markClientMessagesRead(client.id);
 	};
 
+	// With the real backend the chat is not preloaded: the server keeps the
+	// client's own counter of unread support replies (`unreadMessages`), and
+	// reading the thread is what resets it. In Mock mode it is derived from the messages.
+	const { isBackend } = app.capabilities;
+	const unread = isBackend
+		? client.unreadMessages
+		: client.messages.filter((m) => m.from === "support" && !m.read).length;
+
 	// Auto-mark any support replies as read whenever they arrive while the
 	// support tab is already open (e.g. the 1s auto-reply, or a real agent reply).
 	useEffect(() => {
 		if (tab !== "support") return;
-		const hasUnreadFromSupport = client.messages.some(
-			(m) => m.from === "support" && !m.read
-		);
-		if (hasUnreadFromSupport) void app.markClientMessagesRead(client.id);
-	}, [tab, client.messages, client.id, app]);
-
-	// For the CLIENT tab: unread = messages from support not yet seen by the client.
-	const unread = client.messages.filter(
-		(m) => m.from === "support" && !m.read
-	).length;
+		if (unread > 0) void app.markClientMessagesRead(client.id);
+	}, [tab, unread, client.id, app]);
 
 	return (
 		<div>

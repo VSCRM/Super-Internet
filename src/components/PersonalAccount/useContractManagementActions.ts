@@ -3,6 +3,7 @@ import { useApp } from "../../context/AppContext";
 import { useModal } from "../../context/ModalContext";
 import { useConfirmedAction } from "../../hooks/useConfirmedAction";
 import type { ClientUser } from "../../types/models";
+import { isFailure } from "../../shared/lib/result";
 
 export interface ContractManagementActions {
 	readonly editAddress: () => Promise<void>;
@@ -15,7 +16,7 @@ export function useContractManagementActions(
 ): ContractManagementActions {
 	const app = useApp();
 	const modal = useModal();
-	const { runVoid } = useConfirmedAction();
+	const { runResult } = useConfirmedAction();
 	const { t } = useTranslation();
 
 	const editAddress = async (): Promise<void> => {
@@ -27,7 +28,11 @@ export function useContractManagementActions(
 		);
 		if (!address) return;
 
-		await app.updateContractAddress(client.id, address);
+		const result = await app.updateContractAddress(client.id, address);
+		if (isFailure(result)) {
+			await modal.show(t("modal.error"), result.error.message, "error");
+			return;
+		}
 		await modal.show(
 			t("modal.success"),
 			t("address.updatedMessage"),
@@ -36,7 +41,7 @@ export function useContractManagementActions(
 	};
 
 	const deleteContract = (): Promise<boolean> =>
-		runVoid({
+		runResult({
 			confirmTitle: t("address.deleteConfirmTitle"),
 			confirmMessage: t("address.deleteConfirmMessage"),
 			successMessage: t("address.deletedMessage"),

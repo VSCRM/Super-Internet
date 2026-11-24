@@ -4,6 +4,7 @@ import { useModal } from "../../context/ModalContext";
 import type { ClientUser } from "../../types/models";
 import { isFailure } from "../../shared/lib/result";
 import { paymentRequestSchema } from "../../shared/schemas/payment.schema";
+import { SERVICE_PRICES } from "../../types/models";
 
 export interface PaymentActions {
 	readonly pay: () => Promise<void>;
@@ -29,7 +30,7 @@ export function usePaymentAction(client: ClientUser): PaymentActions {
 		const amountStr = await modal.prompt(
 			t("payment.promptTitle"),
 			t("payment.promptMessage"),
-			"300"
+			String(SERVICE_PRICES[client.contract?.serviceType ?? "internet"])
 		);
 		if (amountStr === null) return;
 
@@ -68,10 +69,16 @@ export function usePaymentAction(client: ClientUser): PaymentActions {
 	};
 
 	const toggleRecurring = async (): Promise<void> => {
-		const next = await app.toggleRecurringPayment(client.id);
+		const result = await app.toggleRecurringPayment(client.id);
+		if (isFailure(result)) {
+			await modal.show(t("modal.error"), result.error.message, "error");
+			return;
+		}
 		await modal.show(
 			t("modal.success"),
-			next ? t("payment.recurringToggledOn") : t("payment.recurringToggledOff"),
+			result.value
+				? t("payment.recurringToggledOn")
+				: t("payment.recurringToggledOff"),
 			"success"
 		);
 	};

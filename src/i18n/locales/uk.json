@@ -32,7 +32,11 @@
 		"submitLogin": "Увійти",
 		"submitRegister": "Зареєструватися",
 		"registrationSuccessTitle": "Успіх",
-		"registrationSuccessMessage": "Реєстрацію завершено! Тепер оберіть послугу."
+		"registrationSuccessMessage": "Реєстрацію завершено! Тепер оберіть послугу.",
+		"google": "Увійти через Google",
+		"orDivider": "або",
+		"googleFailed": "Не вдалося увійти через Google. Спробуйте ще раз.",
+		"googleSigningIn": "Входимо через Google…"
 	},
 	"recovery": {
 		"title": "Відновлення паролю",
@@ -94,15 +98,20 @@
 		"delete": "Видалити договір",
 		"deleteAccount": "Видалити акаунт",
 		"notIssued": "Договір не оформлено",
-		"addressNotSpecified": "Не вказано"
+		"addressNotSpecified": "Не вказано",
+		"fioPromptTitle": "ПІБ для договору",
+		"fioPromptMessage": "Вкажіть повне ПІБ (три слова, кирилицею), воно буде записане в договір.",
+		"fioPlaceholder": "Іванов Іван Іванович",
+		"phonePromptTitle": "Телефон для договору",
+		"phonePromptMessage": "Вкажіть номер телефону у форматі +380XXXXXXXXX."
 	},
 	"service": {
 		"internetTitle": "Інтернет",
 		"internetDesc": "Швидкісне та якісне з'єднання",
-		"internetPrice": "300 грн/міс",
+		"internetPrice": "{{price}} грн/міс",
 		"internetTvTitle": "Інтернет + Телебачення",
 		"internetTvDesc": "Подвійна вигода!",
-		"internetTvPrice": "450 грн/міс",
+		"internetTvPrice": "{{price}} грн/міс",
 		"currentService": "Поточна послуга",
 		"balance": "Баланс:",
 		"balanceValue": "{{amount}} грн",
@@ -177,7 +186,8 @@
 		"viewProfile": "Переглянути профіль",
 		"closeTicket": "Закрити звернення",
 		"closeAria": "Закрити чат",
-		"chatWith": "Чат з {{fio}}"
+		"chatWith": "Чат з {{fio}}",
+		"lastMessage": "Останнє повідомлення: {{text}}"
 	},
 	"profile": {
 		"modalTitle": "Профіль клієнта",
@@ -187,7 +197,9 @@
 		"myProfile": "Мій профіль",
 		"save": "Зберегти зміни",
 		"updatedMessage": "Профіль оновлено!",
-		"contractUpdatedMessage": "Договір оновлено!"
+		"contractUpdatedMessage": "Договір оновлено!",
+		"readOnlyNotice": "Редагування профілю наразі недоступне.",
+		"contractReadOnlyNotice": "Редагування договору наразі недоступне."
 	},
 	"account": {
 		"deleteConfirmTitle": "Видалення акаунта",
@@ -270,7 +282,14 @@
 		"userNotFound": "Користувача не знайдено",
 		"emailSendFailed": "Не вдалося надіслати email з кодом підтвердження",
 		"invalidPaymentAmount": "Сума платежу має бути більшою за 0",
-		"privatBankChargeFailed": "Не вдалося провести платіж через PrivatBank"
+		"privatBankChargeFailed": "Не вдалося провести платіж через PrivatBank",
+		"networkError": "Немає зв’язку із сервером. Перевірте підключення до інтернету.",
+		"backendUnavailable": "Сервер недоступний. Перевірте, що бекенд запущено (за замовчуванням http://localhost:8080).",
+		"sessionExpired": "Сеанс завершено. Увійдіть знову.",
+		"forbidden": "Недостатньо прав для цієї дії",
+		"contractExists": "Договір для цього акаунта вже існує",
+		"notSupportedByBackend": "Ця дія поки недоступна на сервері",
+		"phoneRequired": "Вкажіть номер телефону"
 	},
 	"landing": {
 		"menu": {

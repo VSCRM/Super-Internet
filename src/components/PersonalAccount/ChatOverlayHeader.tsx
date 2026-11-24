@@ -1,5 +1,6 @@
 import type { ReactElement } from "react";
 import { useTranslation } from "react-i18next";
+import { useApp } from "../../context/AppContext";
 import type { ClientUser } from "../../types/models";
 import styles from "./SupportChatOverlay.module.scss";
 
@@ -18,10 +19,13 @@ export function ChatOverlayHeader({
 	onClose,
 }: ChatOverlayHeaderProps): ReactElement {
 	const { t } = useTranslation();
+	const { capabilities } = useApp();
 	return (
 		<div className={styles["chat-header"]}>
 			<div>
-				<h3 className={styles["chat-header__title"]}>{client.fio}</h3>
+				<h3 className={styles["chat-header__title"]}>
+					{client.fio || client.email}
+				</h3>
 				<p className={styles["chat-header__subtitle"]}>{client.email}</p>
 			</div>
 			<div className={styles["chat-header__actions"]}>
@@ -31,12 +35,14 @@ export function ChatOverlayHeader({
 				>
 					{t("tickets.viewProfile")}
 				</button>
-				<button
-					className={styles["close-ticket-button"]}
-					onClick={onCloseTicket}
-				>
-					{t("tickets.closeTicket")}
-				</button>
+				{capabilities.canCloseTicket && (
+					<button
+						className={styles["close-ticket-button"]}
+						onClick={onCloseTicket}
+					>
+						{t("tickets.closeTicket")}
+					</button>
+				)}
 				<button
 					className={styles["icon-button"]}
 					onClick={onClose}

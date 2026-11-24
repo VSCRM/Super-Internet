@@ -9,6 +9,8 @@ import { EmailField } from "../../molecules/EmailField/EmailField";
 import { PasswordField } from "../../molecules/PasswordField/PasswordField";
 import { PasswordRecoveryPanel } from "../PasswordRecoveryPanel/PasswordRecoveryPanel";
 import { LanguageSwitcher } from "../../molecules/LanguageSwitcher/LanguageSwitcher";
+import { GoogleSignInButton } from "../../molecules/GoogleSignInButton/GoogleSignInButton";
+import { env } from "../../../shared/config/env";
 import { useZodForm } from "../../../hooks/useZodForm";
 import { isFailure } from "../../../shared/lib/result";
 import {
@@ -21,6 +23,10 @@ type AuthMode = "login" | "register" | "recovery";
 
 export function AuthScreen(): ReactElement {
 	const { login, register } = useApp();
+	// The backend sends the browser to /login?error=google (-> /account?error=google) when Google sign-in fails.
+	const [googleFailed] = useState(
+		() => new URLSearchParams(window.location.search).get("error") === "google"
+	);
 	const modal = useModal();
 	const { t } = useTranslation();
 
@@ -167,6 +173,13 @@ export function AuthScreen(): ReactElement {
 					>
 						{t("auth.submitLogin")}
 					</Button>
+
+					{env.backendMode && googleFailed && (
+						<p role="alert" className={styles["auth-screen__error"]}>
+							{t("auth.googleFailed")}
+						</p>
+					)}
+					{env.backendMode && <GoogleSignInButton />}
 				</form>
 			)}
 
@@ -234,6 +247,8 @@ export function AuthScreen(): ReactElement {
 					<Button type="submit" fullWidth isLoading={isSubmitting}>
 						{t("auth.submitRegister")}
 					</Button>
+
+					{env.backendMode && <GoogleSignInButton />}
 				</form>
 			)}
 		</div>

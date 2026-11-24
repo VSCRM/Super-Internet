@@ -1,15 +1,17 @@
+import { env } from "../../shared/config/env";
 import { getUserRepository } from "../repositories/userRepositoryFactory";
 import { getEmailService } from "../email/emailServiceFactory";
+import { ApiPasswordRecoveryService } from "./ApiPasswordRecoveryService";
 import { PasswordRecoveryService } from "./PasswordRecoveryService";
+import type { PasswordRecovery } from "./PasswordRecoveryService";
 
-let cachedService: PasswordRecoveryService | null = null;
+let cachedService: PasswordRecovery | null = null;
 
-export function getPasswordRecoveryService(): PasswordRecoveryService {
+export function getPasswordRecoveryService(): PasswordRecovery {
 	if (!cachedService) {
-		cachedService = new PasswordRecoveryService(
-			getUserRepository(),
-			getEmailService()
-		);
+		cachedService = env.backendMode
+			? new ApiPasswordRecoveryService()
+			: new PasswordRecoveryService(getUserRepository(), getEmailService());
 	}
 	return cachedService;
 }

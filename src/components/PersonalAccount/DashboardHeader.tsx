@@ -11,7 +11,7 @@ export function DashboardHeader({ user }: { user: AppUser }): ReactElement {
 	const { t } = useTranslation();
 	const displayName =
 		user.role === "client"
-			? user.fio
+			? user.fio || user.email
 			: user.role === "support"
 				? user.name
 				: user.email;

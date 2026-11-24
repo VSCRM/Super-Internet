@@ -2,7 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import type { ReactElement } from "react";
 import { useTranslation } from "react-i18next";
 import { useApp } from "../../context/AppContext";
+import { useModal } from "../../context/ModalContext";
 import { useConfirmedAction } from "../../hooks/useConfirmedAction";
+import { isFailure } from "../../shared/lib/result";
 import { useDialogA11y } from "../../hooks/useDialogA11y";
 import type { ClientUser } from "../../types/models";
 import { ChatThread } from "./ChatThread";
@@ -31,8 +33,10 @@ export function SupportChatOverlay({
 	onTicketClosed,
 }: SupportChatOverlayProps): ReactElement {
 	const app = useApp();
-	const { runVoid } = useConfirmedAction();
+	const { runResult } = useConfirmedAction();
+	const modal = useModal();
 	const { t } = useTranslation();
+	const { loadThread, capabilities } = app;
 	const [visible, setVisible] = useState(false);
 	const [showProfile, setShowProfile] = useState(false);
 	const dialogRef = useRef<HTMLDivElement>(null);
@@ -44,6 +48,17 @@ export function SupportChatOverlay({
 		);
 		return () => window.clearTimeout(id);
 	}, []);
+
+	// Backend mode: the ticket list only carries each thread's last message, so
+	// fetch the full thread when the overlay opens and keep it fresh while open.
+	// (Reading it also marks the client's messages as read on the server.)
+	const clientId = client.id;
+	useEffect(() => {
+		if (!capabilities.isBackend) return;
+		void loadThread(clientId);
+		const id = window.setInterval(() => void loadThread(clientId), 4000);
+		return () => window.clearInterval(id);
+	}, [capabilities.isBackend, clientId, loadThread]);
 
 	// Mark client->support messages as read whenever new ones arrive while
 	// the overlay is open (mirrors the same pattern in ClientDashboard).
@@ -63,8 +78,15 @@ export function SupportChatOverlay({
 	// handled by that (topmost) dialog only, not both at once.
 	useDialogA11y(dialogRef, close, !showProfile);
 
+	const handleSend = async (text: string): Promise<void> => {
+		const result = await app.sendSupportMessage(client.id, text);
+		if (isFailure(result)) {
+			await modal.show(t("modal.error"), result.error.message, "error");
+		}
+	};
+
 	const handleCloseTicket = async (): Promise<void> => {
-		const wasClosed = await runVoid({
+		const wasClosed = await runResult({
 			confirmTitle: t("tickets.closeConfirmTitle"),
 			confirmMessage: t("tickets.closeConfirmMessage", { fio: client.fio }),
 			successMessage: t("tickets.closedMessage"),
@@ -105,9 +127,7 @@ export function SupportChatOverlay({
 					/>
 
 					<div className={styles["chat-input-wrapper"]}>
-						<ChatInput
-							onSend={(text) => void app.sendSupportMessage(client.id, text)}
-						/>
+						<ChatInput onSend={(text) => void handleSend(text)} />
 					</div>
 				</div>
 			</div>

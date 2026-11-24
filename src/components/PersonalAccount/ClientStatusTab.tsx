@@ -1,7 +1,8 @@
 import type { ReactElement } from "react";
 import { useTranslation } from "react-i18next";
+import { useApp } from "../../context/AppContext";
 import type { ClientUser, ServiceType } from "../../types/models";
-import { SERVICE_NAMES } from "../../types/models";
+import { SERVICE_NAMES, SERVICE_PRICES } from "../../types/models";
 import { Button } from "../atoms/Button/Button";
 import { ToggleSwitch } from "../atoms/ToggleSwitch/ToggleSwitch";
 import { ServiceStatusBadge } from "../molecules/ServiceStatusBadge/ServiceStatusBadge";
@@ -31,6 +32,7 @@ export function ClientStatusTab({
 	onToggleRecurring,
 }: ClientStatusTabProps): ReactElement {
 	const { t, i18n } = useTranslation();
+	const { capabilities } = useApp();
 
 	if (!client.contract) {
 		return (
@@ -43,7 +45,9 @@ export function ClientStatusTab({
 						<h3>{t("service.internetTitle")}</h3>
 						<p>{t("service.internetDesc")}</p>
 						<p>
-							<strong>{t("service.internetPrice")}</strong>
+							<strong>
+								{t("service.internetPrice", { price: SERVICE_PRICES.internet })}
+							</strong>
 						</p>
 					</div>
 					<div
@@ -53,7 +57,11 @@ export function ClientStatusTab({
 						<h3>{t("service.internetTvTitle")}</h3>
 						<p>{t("service.internetTvDesc")}</p>
 						<p>
-							<strong>{t("service.internetTvPrice")}</strong>
+							<strong>
+								{t("service.internetTvPrice", {
+									price: SERVICE_PRICES.internet_tv,
+								})}
+							</strong>
 						</p>
 					</div>
 				</div>
@@ -93,11 +101,13 @@ export function ClientStatusTab({
 				<div className={styles["recurring-payment"]}>
 					<h4>{t("service.recurringPayment")}</h4>
 					<div className={styles["recurring-payment__row"]}>
-						<ToggleSwitch
-							checked={!!client.isRecurring}
-							onChange={onToggleRecurring}
-							label={t("service.recurringPayment")}
-						/>
+						{capabilities.canToggleRecurring && (
+							<ToggleSwitch
+								checked={!!client.isRecurring}
+								onChange={onToggleRecurring}
+								label={t("service.recurringPayment")}
+							/>
+						)}
 						<span className={styles["recurring-payment__status"]}>
 							{client.isRecurring
 								? t("service.recurringActive")

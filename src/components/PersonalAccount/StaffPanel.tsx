@@ -11,14 +11,14 @@ import styles from "./AdminDashboard.module.scss";
 
 /** Single responsibility: list support staff and let the admin add/remove them. */
 export function StaffPanel(): ReactElement {
-	const { users, deleteStaff } = useApp();
-	const { runVoid } = useConfirmedAction();
+	const { users, deleteStaff, capabilities } = useApp();
+	const { runResult } = useConfirmedAction();
 	const { t } = useTranslation();
 	const [isAdding, setIsAdding] = useState(false);
 	const staff = users.filter((u): u is SupportUser => u.role === "support");
 
 	const handleDeleteStaff = (email: string): Promise<boolean> =>
-		runVoid({
+		runResult({
 			confirmTitle: t("staff.deleteConfirmTitle"),
 			confirmMessage: t("staff.deleteConfirmMessage"),
 			successMessage: t("staff.deletedMessage"),
@@ -45,12 +45,14 @@ export function StaffPanel(): ReactElement {
 								<br />
 								<small>{member.email}</small>
 							</div>
-							<Button
-								variant="secondary"
-								onClick={() => void handleDeleteStaff(member.email)}
-							>
-								{t("staff.delete")}
-							</Button>
+							{capabilities.canDeleteAccounts && (
+								<Button
+									variant="secondary"
+									onClick={() => void handleDeleteStaff(member.email)}
+								>
+									{t("staff.delete")}
+								</Button>
+							)}
 						</div>
 					</div>
 				))}

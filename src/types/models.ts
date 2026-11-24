@@ -1,3 +1,5 @@
+import { env } from "../shared/config/env";
+
 export type UserRole = "client" | "support" | "admin";
 
 export type ServiceType = "internet" | "internet_tv";
@@ -69,7 +71,11 @@ export const SERVICE_NAMES: Record<ServiceType, string> = {
 	internet_tv: "service.internetTvTitle",
 };
 
+/**
+ * Monthly prices in UAH. The backend does not expose them over HTTP, so the
+ * frontend takes them from VITE_PRICE_* - keep them in sync with the backend.
+ */
 export const SERVICE_PRICES: Record<ServiceType, number> = {
-	internet: 300,
-	internet_tv: 450,
+	internet: env.priceInternet,
+	internet_tv: env.priceInternetTv,
 };

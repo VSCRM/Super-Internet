@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import type { Dispatch, SetStateAction } from "react";
 import type { AppUser, SupportUser } from "../types/models";
 import type { AppError, Result } from "../shared/lib/result";
-import { appError, failure, isSuccess } from "../shared/lib/result";
+import { appError, failure, isSuccess, success } from "../shared/lib/result";
 import { sanitizeText } from "../shared/lib/sanitize";
 import { createSafeId } from "../shared/lib/id";
 import { hashPassword } from "../shared/lib/passwordHasher";
@@ -11,14 +11,14 @@ import type { UserRepository } from "../services/repositories/UserRepository";
 
 export interface UserActions {
 	updateUser: (user: AppUser) => Promise<Result<AppUser, AppError>>;
-	deleteUser: (userId: number) => Promise<void>;
+	deleteUser: (userId: number) => Promise<Result<void, AppError>>;
 	getUserById: (id: number) => AppUser | undefined;
 	addStaff: (
 		email: string,
 		password: string,
 		name: string
 	) => Promise<Result<SupportUser, AppError>>;
-	deleteStaff: (email: string) => Promise<void>;
+	deleteStaff: (email: string) => Promise<Result<void, AppError>>;
 }
 
 export function useUserActions(
@@ -44,10 +44,11 @@ export function useUserActions(
 	);
 
 	const deleteUser = useCallback(
-		async (userId: number) => {
+		async (userId: number): Promise<Result<void, AppError>> => {
 			await repository.remove(userId);
 			setUsers((prev) => prev.filter((user) => user.id !== userId));
 			setCurrentUser((prev) => (prev?.id === userId ? null : prev));
+			return success(undefined);
 		},
 		[repository, setCurrentUser, setUsers]
 	);
@@ -85,12 +86,13 @@ export function useUserActions(
 	);
 
 	const deleteStaff = useCallback(
-		async (email: string) => {
+		async (email: string): Promise<Result<void, AppError>> => {
 			const lookup = await repository.findByEmail(email);
 			if (isSuccess(lookup) && lookup.value) {
 				await repository.remove(lookup.value.id);
 				await refreshUsers();
 			}
+			return success(undefined);
 		},
 		[refreshUsers, repository]
 	);

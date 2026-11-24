@@ -11,14 +11,14 @@ import styles from "./AdminDashboard.module.scss";
 
 /** Single responsibility: list all client accounts (paginated) with a way to delete them. */
 export function ClientsPanel(): ReactElement {
-	const { users, deleteUser } = useApp();
-	const { runVoid } = useConfirmedAction();
+	const { users, deleteUser, capabilities } = useApp();
+	const { runResult } = useConfirmedAction();
 	const { t } = useTranslation();
 	const clients = users.filter((u): u is ClientUser => u.role === "client");
 	const { page, pageCount, pageItems, goToPage } = usePagination(clients);
 
 	const handleDelete = (client: ClientUser): Promise<boolean> =>
-		runVoid({
+		runResult({
 			confirmTitle: t("clients.deleteConfirmTitle"),
 			confirmMessage: t("clients.deleteConfirmMessage", { fio: client.fio }),
 			successMessage: t("clients.deletedMessage"),
@@ -36,7 +36,11 @@ export function ClientsPanel(): ReactElement {
 						<ClientCard
 							key={client.id}
 							client={client}
-							onDelete={(c) => void handleDelete(c)}
+							onDelete={
+								capabilities.canDeleteAccounts
+									? (c) => void handleDelete(c)
+									: undefined
+							}
 						/>
 					))
 				)}

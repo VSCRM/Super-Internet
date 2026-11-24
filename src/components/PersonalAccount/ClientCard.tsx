@@ -7,7 +7,8 @@ import shared from "./dashboardShared.module.scss";
 
 export interface ClientCardProps {
 	readonly client: ClientUser;
-	readonly onDelete: (client: ClientUser) => void;
+	/** Omitted when the active data layer cannot delete accounts. */
+	readonly onDelete?: (client: ClientUser) => void;
 }
 
 /** Single responsibility: one client's summary tile in the admin's client list. */
@@ -18,7 +19,7 @@ export function ClientCard({
 	const { t } = useTranslation();
 	return (
 		<div className={shared["ticket-card"]}>
-			<h4>{client.fio}</h4>
+			<h4>{client.fio || client.email}</h4>
 			<p>
 				{t("auth.fields.email")}: {client.email}
 			</p>
@@ -35,13 +36,15 @@ export function ClientCard({
 					<Badge variant="debt">{t("clients.noContract")}</Badge>
 				)}
 			</p>
-			<Button
-				variant="danger"
-				style={{ marginTop: "0.5rem", width: "100%" }}
-				onClick={() => onDelete(client)}
-			>
-				{t("clients.delete")}
-			</Button>
+			{onDelete && (
+				<Button
+					variant="danger"
+					style={{ marginTop: "0.5rem", width: "100%" }}
+					onClick={() => onDelete(client)}
+				>
+					{t("clients.delete")}
+				</Button>
+			)}
 		</div>
 	);
 }
