@@ -3,6 +3,8 @@ import { loadEnv } from "vite";
 import type { Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import { fileURLToPath, URL } from "node:url";
+import { copyFileSync } from "node:fs";
+import { resolve } from "node:path";
 
 const BASE = "/Super-Internet/";
 
@@ -31,6 +33,26 @@ function redirectAuthRoutesToBase(): Plugin {
 	};
 }
 
+/**
+ * Build only. GitHub Pages serves static files, so a SPA route such as
+ * `/Super-Internet/oauth-callback` returns 404. Pages serves `404.html` for
+ * unknown paths, so a copy of index.html there lets the SPA start and
+ * React Router handle the route (the `#token` fragment is preserved).
+ */
+function spaFallback(): Plugin {
+	let outDir = "dist";
+	return {
+		name: "spa-404-fallback",
+		apply: "build",
+		configResolved(cfg) {
+			outDir = cfg.build.outDir;
+		},
+		closeBundle() {
+			copyFileSync(resolve(outDir, "index.html"), resolve(outDir, "404.html"));
+		},
+	};
+}
+
 export default defineConfig(({ mode }) => {
 	// Where the Spring Boot backend listens (see its `server.port`, default 8080).
 	// Used only by the dev-server proxy below; override in `.env.local` if needed.
@@ -41,7 +63,7 @@ export default defineConfig(({ mode }) => {
 
 	return {
 		base: BASE,
-		plugins: [react(), redirectAuthRoutesToBase()],
+		plugins: [react(), redirectAuthRoutesToBase(), spaFallback()],
 		resolve: {
 			alias: {
 				"@": fileURLToPath(new URL("./src", import.meta.url)),
