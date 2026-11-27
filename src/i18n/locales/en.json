@@ -207,6 +207,8 @@
 		"deletedMessage": "Account deleted!"
 	},
 	"payment": {
+		"returnTitle": "Payment",
+		"returnMessage": "Thank you! The bank is processing the payment. Your balance will update in a few seconds.",
 		"notApprovedTitle": "Notice",
 		"notApprovedMessage": "Waiting for connection approval from the administrator. Payment will be available after activation.",
 		"promptTitle": "Payment",

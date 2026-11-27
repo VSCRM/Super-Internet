@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import type { ReactElement } from "react";
 import { useTranslation } from "react-i18next";
 import { useApp } from "../../context/AppContext";
+import { useModal } from "../../context/ModalContext";
 import type { ClientUser } from "../../types/models";
 import { NavTabs } from "../molecules/NavTabs/NavTabs";
 import { ProfileEditForm } from "../organisms/ProfileEditForm/ProfileEditForm";
@@ -33,8 +34,30 @@ export function ClientDashboard({
 	client,
 }: ClientDashboardProps): ReactElement {
 	const app = useApp();
+	const modal = useModal();
 	const { t } = useTranslation();
 	const [tab, setTab] = useState<DashboardTab>("status");
+
+	// LiqPay sends the browser back here with `?payment=return`. The balance is
+	// credited by the bank's server-to-server callback, which can arrive a few
+	// seconds later, so only tell the user it is being processed.
+	useEffect(() => {
+		const params = new URLSearchParams(window.location.search);
+		if (params.get("payment") !== "return") return;
+		params.delete("payment");
+		const query = params.toString();
+		window.history.replaceState(
+			null,
+			"",
+			window.location.pathname + (query ? `?${query}` : "")
+		);
+		void modal.show(
+			t("payment.returnTitle"),
+			t("payment.returnMessage"),
+			"info"
+		);
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- run once on arrival
+	}, []);
 
 	const selectService = useServiceSelectionAction(client);
 	const { pay, toggleRecurring } = usePaymentAction(client);
