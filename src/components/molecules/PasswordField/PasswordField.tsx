@@ -13,6 +13,8 @@ export interface PasswordFieldProps extends Omit<
 > {
 	readonly label: string;
 	readonly value: string;
+	/** Extra error (e.g. "same as the current password") shown in red under the field. */
+	readonly errorMessage?: string;
 }
 
 /**
@@ -28,6 +30,7 @@ export function PasswordField({
 	label,
 	value,
 	id,
+	errorMessage,
 	...inputProps
 }: PasswordFieldProps): ReactElement {
 	const { t } = useTranslation();
@@ -45,9 +48,17 @@ export function PasswordField({
 				id={id}
 				type="password"
 				value={value}
-				validationState={isEmpty ? "idle" : allSatisfied ? "valid" : "invalid"}
+				validationState={
+					isEmpty ? "idle" : allSatisfied && !errorMessage ? "valid" : "invalid"
+				}
 				{...inputProps}
 			/>
+
+			{errorMessage && (
+				<p className={styles["password-field__error"]} role="alert">
+					{errorMessage}
+				</p>
+			)}
 
 			{!isEmpty && (
 				<ul className={styles["password-field__requirements"]}>

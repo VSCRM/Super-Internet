@@ -12,7 +12,7 @@ export interface PaymentChargeReceipt {
 	readonly amount: number;
 	readonly currency: "UAH";
 	readonly processedAt: string;
-	readonly gateway: "mock" | "privatbank";
+	readonly gateway: "mock";
 }
 
 export interface CardTokenizationRequest {
@@ -37,11 +37,11 @@ export interface TokenizedCard {
 
 /**
  * Strategy/Factory-friendly polymorphic interface for payment processing.
- * `MockPaymentGateway` fulfils it for local development; `PrivatBankPaymentGateway`
- * is the seam for the real PrivatBank Acquiring API.
+ * `MockPaymentGateway` fulfils it for local development. Real payments go
+ * through the backend (LiqPay), not through a frontend gateway.
  */
 export interface PaymentGateway {
-	readonly name: "mock" | "privatbank";
+	readonly name: "mock";
 	charge(
 		request: PaymentChargeRequest
 	): Promise<Result<PaymentChargeReceipt, AppError>>;

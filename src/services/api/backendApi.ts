@@ -4,6 +4,7 @@ import type { AppError, Result } from "../../shared/lib/result";
 import { failure, success } from "../../shared/lib/result";
 import { apiClient, call, toAppError } from "./apiClient";
 import type {
+	CheckoutSessionDto,
 	AuthDto,
 	ContractDto,
 	ConversationDto,
@@ -105,6 +106,19 @@ export const backendApi = {
 		return call(() => apiClient.patch<UserDto>("/users/me", payload));
 	},
 
+	/**
+	 * Creates (no `currentPassword`) or changes the password of the signed-in
+	 * account. 400 = wrong current password or a weak new one.
+	 */
+	setPassword(newPassword: string, currentPassword?: string): Res<void> {
+		return call(() =>
+			apiClient.put<void>("/users/me/password", {
+				newPassword,
+				...(currentPassword === undefined ? {} : { currentPassword }),
+			})
+		);
+	},
+
 	/** Deletes the signed-in client's own account and all its data. */
 	deleteOwnAccount(): Res<void> {
 		return call(() => apiClient.delete<void>("/users/me"));
@@ -171,6 +185,21 @@ export const backendApi = {
 			apiClient.post<PaymentDto>("/payments", {
 				amount,
 				...(recurring === undefined ? {} : { recurring }),
+			})
+		);
+	},
+
+	/** Starts a real Privat24 payment; the backend answers with the payment page URL. */
+	startPrivat24Checkout(
+		amount: number,
+		recurring: boolean
+	): Res<CheckoutSessionDto> {
+		return call(() =>
+			apiClient.post<CheckoutSessionDto>("/payments/privat24/checkout", {
+				amount,
+				// Only ever switched ON here: sending `false` would turn off a
+				// recurring payment the client already has.
+				...(recurring ? { recurring: true } : {}),
 			})
 		);
 	},

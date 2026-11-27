@@ -1,0 +1,53 @@
+.privat24 {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.privat24__button {
+	width: 4.5rem;
+	height: 4.5rem;
+	padding: 0;
+	border: 2px solid transparent;
+	border-radius: 50%;
+	background: #1c1c1c;
+	overflow: hidden;
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	transition:
+		transform 0.2s,
+		border-color 0.2s,
+		box-shadow 0.2s;
+
+	&:hover {
+		transform: scale(1.06);
+		box-shadow: 0 0 14px rgba(255, 255, 255, 0.25);
+	}
+
+	&:focus-visible {
+		outline: none;
+		border-color: var(--purple-color);
+	}
+}
+
+.privat24__logo {
+	width: 100%;
+	height: 100%;
+	display: block;
+	object-fit: cover;
+	border-radius: 50%;
+}
+
+.privat24__fallback {
+	color: #fff;
+	font-size: 1.6rem;
+	font-weight: 700;
+}
+
+.privat24__caption {
+	font-size: 0.8rem;
+	opacity: 0.85;
+}

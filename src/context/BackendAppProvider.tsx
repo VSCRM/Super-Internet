@@ -10,6 +10,7 @@ import type {
 	SupportUser,
 } from "../types/models";
 import type { AppError, Result } from "../shared/lib/result";
+import { isSafePaymentUrl } from "../shared/lib/paymentUrl";
 import { appError, failure, success } from "../shared/lib/result";
 import { getAuthStrategy } from "../services/auth/authStrategyFactory";
 import { backendApi } from "../services/api/backendApi";
@@ -338,6 +339,33 @@ export function BackendAppProvider({
 		[refreshSelf]
 	);
 
+	const startPrivat24Payment = useCallback<
+		AppContextValue["startPrivat24Payment"]
+	>(
+		async (amount, isRecurring) => {
+			const result = await backendApi.startPrivat24Checkout(
+				amount,
+				isRecurring
+			);
+			if (!result.ok) {
+				// The endpoint does not exist / is not enabled on this backend.
+				const notAvailable = ["HTTP_404", "HTTP_405", "HTTP_501"].includes(
+					result.error.code
+				);
+				return failure(
+					notAvailable
+						? { ...result.error, message: t("payment.realNotAvailable") }
+						: result.error
+				);
+			}
+			if (!isSafePaymentUrl(result.value.paymentUrl)) {
+				return failure(appError("BAD_PAYMENT_URL", t("payment.realBadUrl")));
+			}
+			return success(result.value.paymentUrl);
+		},
+		[t]
+	);
+
 	/* ---------------- profile, contract edits, account deletion ---------------- */
 
 	const updateProfile = useCallback<AppContextValue["updateProfile"]>(
@@ -359,6 +387,33 @@ export function BackendAppProvider({
 			};
 			setCurrentUser(updated);
 			return success(updated);
+		},
+		[t]
+	);
+
+	const setPassword = useCallback<AppContextValue["setPassword"]>(
+		async (newPassword, currentPassword) => {
+			const result = await backendApi.setPassword(newPassword, currentPassword);
+			if (!result.ok) {
+				// A 400 here is either a wrong current password or a weak new one; the form
+				// validates strength itself, so a plain 400 (no field errors) is the former.
+				const wrongCurrent =
+					result.error.code === "HTTP_400" &&
+					currentPassword !== undefined &&
+					!result.error.details?.fieldErrors;
+				return failure(
+					wrongCurrent
+						? { ...result.error, message: t("password.wrongCurrent") }
+						: result.error
+				);
+			}
+
+			setCurrentUser((previous) =>
+				previous?.role === "client"
+					? { ...previous, hasPassword: true }
+					: previous
+			);
+			return success(undefined);
 		},
 		[t]
 	);
@@ -544,11 +599,13 @@ export function BackendAppProvider({
 			addStaff,
 			deleteStaff,
 			updateProfile,
+			setPassword,
 			selectService,
 			updateContractAddress,
 			updateContractFields,
 			deleteContract,
 			makePayment,
+			startPrivat24Payment,
 			toggleRecurringPayment,
 			approveConnection,
 			setEquipmentStatus,
@@ -572,6 +629,7 @@ export function BackendAppProvider({
 			deleteUser,
 			deleteStaff,
 			updateProfile,
+			setPassword,
 			updateContractAddress,
 			updateContractFields,
 			deleteContract,
@@ -579,6 +637,7 @@ export function BackendAppProvider({
 			closeTicket,
 			selectService,
 			makePayment,
+			startPrivat24Payment,
 			approveConnection,
 			setEquipmentStatus,
 			sendClientMessage,

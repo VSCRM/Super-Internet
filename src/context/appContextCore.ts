@@ -77,6 +77,14 @@ export interface AppContextValue {
 		clientId: number,
 		input: EditableProfileInput
 	) => Promise<Result<ClientUser, AppError>>;
+	/**
+	 * Backend mode: creates a password (Google account, no `currentPassword`)
+	 * or changes it (`currentPassword` required). Unsupported in Mock mode.
+	 */
+	setPassword: (
+		newPassword: string,
+		currentPassword?: string
+	) => Promise<Result<void, AppError>>;
 	selectService: (
 		clientId: number,
 		serviceType: ServiceType,
@@ -97,6 +105,14 @@ export interface AppContextValue {
 		amount: number,
 		isRecurring: boolean
 	) => Promise<Result<number, AppError>>;
+	/**
+	 * Real payment (`VITE_PAYMENT_MODE=real`, backend only): asks the backend to
+	 * start a Privat24 payment and returns the page URL to send the user to.
+	 */
+	startPrivat24Payment: (
+		amount: number,
+		isRecurring: boolean
+	) => Promise<Result<string, AppError>>;
 	toggleRecurringPayment: (
 		clientId: number
 	) => Promise<Result<boolean, AppError>>;

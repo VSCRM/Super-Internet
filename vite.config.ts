@@ -35,7 +35,9 @@ export default defineConfig(({ mode }) => {
 	// Where the Spring Boot backend listens (see its `server.port`, default 8080).
 	// Used only by the dev-server proxy below; override in `.env.local` if needed.
 	const fileEnv = loadEnv(mode, process.cwd(), "");
-	const backendOrigin = fileEnv.VITE_BACKEND_ORIGIN || "http://localhost:8080";
+	const backendOrigin = (
+		fileEnv.VITE_BACKEND_ORIGIN?.trim() || "http://localhost:8080"
+	).replace(/\/+$/, "");
 
 	return {
 		base: BASE,
@@ -49,7 +51,9 @@ export default defineConfig(({ mode }) => {
 			open: true,
 			proxy: {
 				// JSON API. Same-origin from the browser's point of view, so no CORS.
-				"/api": { target: backendOrigin },
+				// `changeOrigin` sends the backend's own Host header: a hosted backend
+				// (Render, etc.) routes by it and fails with 5xx/404 for `localhost:5173`.
+				"/api": { target: backendOrigin, changeOrigin: true },
 			},
 		},
 		test: {

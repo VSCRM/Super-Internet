@@ -1,0 +1,111 @@
+.checkout {
+	display: flex;
+	flex-direction: column;
+	gap: 0.2rem;
+	text-align: left;
+}
+
+.checkout__card {
+	position: relative;
+}
+
+.checkout__brand {
+	position: absolute;
+	right: 0.8rem;
+	top: 2.15rem;
+	font-size: 0.7rem;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	padding: 0.15rem 0.5rem;
+	border-radius: 6px;
+	pointer-events: none;
+	transition: opacity 0.2s;
+
+	&:empty {
+		opacity: 0;
+	}
+}
+
+.checkout__brand--visa {
+	background: #1a3a8f;
+	color: #fff;
+	font-style: italic;
+}
+
+.checkout__brand--mastercard {
+	background: #2b2b2b;
+	color: #ffb74d;
+}
+
+.checkout__row {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 1rem;
+}
+
+.checkout__recurring {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	margin: 0.2rem 0 1rem;
+}
+
+.checkout__pay {
+	margin-bottom: 0.6rem;
+}
+
+.checkout__note {
+	margin: 0.8rem 0 0 !important;
+	font-size: 0.75rem;
+	opacity: 0.65;
+	text-align: center;
+}
+
+.checkout__tariff {
+	margin: 0 0 0.6rem !important;
+	font-size: 0.9rem;
+	opacity: 0.85;
+}
+
+.checkout__presets {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	margin-bottom: 1rem;
+}
+
+.checkout__preset {
+	flex: 1 1 auto;
+	padding: 0.5rem 0.8rem;
+	background: transparent;
+	border: 1px solid var(--gray-color);
+	border-radius: 10px;
+	color: var(--white-color);
+	font-family: Tektur, sans-serif;
+	font-size: 0.8rem;
+	cursor: pointer;
+	transition: all 0.2s;
+
+	&:hover {
+		border-color: var(--purple-color);
+	}
+}
+
+.checkout__preset--active {
+	background: var(--purple-color);
+	border-color: var(--purple-color);
+}
+
+.checkout__testCards {
+	margin: 0 0 0.8rem !important;
+	font-size: 0.75rem;
+	opacity: 0.8;
+}
+
+.checkout__or {
+	text-align: center;
+	font-size: 0.8rem;
+	opacity: 0.6;
+	margin: 0.2rem 0 0.6rem;
+}

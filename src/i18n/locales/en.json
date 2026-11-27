@@ -211,15 +211,29 @@
 		"notApprovedMessage": "Waiting for connection approval from the administrator. Payment will be available after activation.",
 		"promptTitle": "Payment",
 		"promptMessage": "Enter the payment amount (UAH):",
-		"invalidAmount": "Please enter a valid amount",
-		"recurringPromptTitle": "Recurring payment",
-		"recurringPromptMessage": "Would you like to make this payment recurring (automatic monthly charge)?",
 		"successTitle": "Success",
 		"successMessage": "Payment of {{amount}} UAH was completed successfully!\n\n",
 		"recurringActivatedLine": "Recurring payment activated.\n",
 		"newBalance": "Your new balance: {{balance}} UAH",
 		"recurringToggledOn": "Recurring payment activated!",
 		"recurringToggledOff": "Recurring payment deactivated!",
+		"tariffLine": "Your plan: {{tariff}} — {{price}} UAH/month",
+		"presetMonths": "{{count}} mo",
+		"amountLabel": "Amount (UAH)",
+		"cardNumber": "Card number",
+		"cardExpiry": "Expiry date",
+		"recurringToggleLabel": "Recurring payment (monthly charge)",
+		"realHint": "You will be redirected to the Privat24 page to confirm the payment securely. The balance is topped up once the bank confirms.",
+		"realNotAvailable": "Real Privat24 payment is not set up on the server yet. Please contact the administrator.",
+		"realBadUrl": "The server returned an invalid payment link.",
+		"realNeedsBackend": "Real payment needs the backend mode (VITE_BACKEND_MODE=true).",
+		"payByCard": "Pay by card",
+		"payViaAppShort": "Pay with the app",
+		"payViaApp": "Pay with the Privat24 app",
+		"or": "or",
+		"appConfirmTitle": "Pay in the Privat24 app",
+		"appConfirmMessage": "Open the Privat24 app and approve the payment of {{amount}} UAH. Then press “Confirm”.",
+		"securityNote": "Card details are used for this payment only and are not stored in the app.",
 		"chargeDescription": "Service payment, contract {{contractId}}"
 	},
 	"address": {
@@ -243,6 +257,17 @@
 		}
 	},
 	"password": {
+		"createTitle": "Create a password",
+		"changeTitle": "Change password",
+		"createHint": "You signed in with Google. Create a password to also sign in with email and password.",
+		"currentLabel": "Current password",
+		"newLabel": "New password",
+		"confirmLabel": "Confirm new password",
+		"createSubmit": "Create password",
+		"changeSubmit": "Change password",
+		"createdMessage": "Password created. You can now sign in with email and password.",
+		"changedMessage": "Password changed.",
+		"wrongCurrent": "Incorrect current password",
 		"requirements": {
 			"length": "At least {{min}} characters",
 			"digit": "At least one digit",
@@ -282,7 +307,6 @@
 		"userNotFound": "User not found",
 		"emailSendFailed": "Failed to send the verification code email",
 		"invalidPaymentAmount": "The payment amount must be greater than 0",
-		"privatBankChargeFailed": "Failed to process the payment via PrivatBank",
 		"networkError": "Cannot reach the server. Check your internet connection.",
 		"backendUnavailable": "The server is unavailable. Make sure the backend is running (default http://localhost:8080).",
 		"sessionExpired": "Your session has ended. Please sign in again.",
@@ -337,6 +361,8 @@
 		},
 		"password": {
 			"required": "Password is required",
+			"sameAsCurrent": "The new password must differ from the current one",
+			"tooLong": "The password is too long (72 characters max)",
 			"mismatch": "Passwords do not match"
 		},
 		"code": {
@@ -345,6 +371,13 @@
 		},
 		"staffName": {
 			"format": "Enter the staff member's name (minimum 2 characters)"
+		},
+		"card": {
+			"numberLength": "The card number must have 16 digits",
+			"notTestCard": "Only test cards are accepted in test mode",
+			"numberInvalid": "Invalid card number",
+			"expiryInvalid": "Invalid or expired date",
+			"cvvInvalid": "CVV must be 3 digits"
 		},
 		"amount": {
 			"positive": "The amount must be greater than 0",

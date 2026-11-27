@@ -49,6 +49,8 @@ export interface ClientUser extends BaseUser {
 	connectionApproved: boolean;
 	unreadMessages: number;
 	isRecurring?: boolean;
+	/** Backend mode only: whether the account has a password (a Google-only account does not). */
+	hasPassword?: boolean;
 	equipmentStatus?: EquipmentStatus;
 	tempCode?: string | null;
 	codeExpiry?: number | null;

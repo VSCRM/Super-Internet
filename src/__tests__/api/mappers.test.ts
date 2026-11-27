@@ -20,9 +20,19 @@ const clientDto: UserDto = {
 	unreadMessages: 2,
 	equipmentStatus: "PENDING",
 	connectionApproved: true,
+	hasPassword: false,
 };
 
 describe("backend mappers", () => {
+	it("carries hasPassword over to the client", () => {
+		const google = mapUser(clientDto);
+		const regular = mapUser({ ...clientDto, hasPassword: true });
+		if (google.role !== "client" || regular.role !== "client")
+			throw new Error("expected client");
+		expect(google.hasPassword).toBe(false);
+		expect(regular.hasPassword).toBe(true);
+	});
+
 	it("maps UPPER_CASE enums to the frontend's lower_case ones", () => {
 		const user = mapUser(clientDto);
 		expect(user.role).toBe("client");

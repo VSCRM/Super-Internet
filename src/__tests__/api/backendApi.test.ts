@@ -31,6 +31,31 @@ describe("backendApi request shapes", () => {
 		expect(bodyOf(calls[1])).toEqual({ amount: 250, recurring: true });
 	});
 
+	it("starts a Privat24 checkout and returns the payment URL", async () => {
+		const { calls } = stubBackend(() => ({
+			status: 200,
+			data: { paymentUrl: "https://www.liqpay.ua/api/3/checkout/?data=x" },
+		}));
+		const result = await backendApi.startPrivat24Checkout(250, false);
+		await backendApi.startPrivat24Checkout(250, true);
+
+		expect(calls[0].url).toBe("/payments/privat24/checkout");
+		expect(result).toEqual({
+			ok: true,
+			value: { paymentUrl: "https://www.liqpay.ua/api/3/checkout/?data=x" },
+		});
+		// `recurring: false` would switch off a recurring payment the client already has
+		expect(bodyOf(calls[0])).toEqual({ amount: 250 });
+		expect(bodyOf(calls[1])).toEqual({ amount: 250, recurring: true });
+	});
+
+	it("reports 501 from the checkout when the bank keys are not set on the backend", async () => {
+		stubBackend(() => ({ status: 501, data: { title: "Not Implemented" } }));
+		const result = await backendApi.startPrivat24Checkout(250, false);
+		expect(result.ok).toBe(false);
+		if (!result.ok) expect(result.error.code).toBe("HTTP_501");
+	});
+
 	it("treats a 404 on /contracts/me as 'no contract yet', not as an error", async () => {
 		stubBackend(() => ({ status: 404, data: { title: "Not Found" } }));
 		const result = await backendApi.ownContract();

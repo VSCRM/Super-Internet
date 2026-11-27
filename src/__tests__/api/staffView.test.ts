@@ -15,6 +15,7 @@ const client: UserDto = {
 	unreadMessages: 9, // the CLIENT's own counter - must not leak into the staff view
 	equipmentStatus: null,
 	connectionApproved: false,
+	hasPassword: true,
 };
 
 const conversation: ConversationDto = {

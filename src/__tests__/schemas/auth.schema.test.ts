@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import {
 	PASSWORD_REQUIREMENTS,
 	isPasswordValid,
+	changePasswordSchema,
+	createPasswordSchema,
 	loginSchema,
 	registerSchema,
 } from "../../shared/schemas/auth.schema";
@@ -112,5 +114,51 @@ describe("registerSchema", () => {
 		if (!result.success) {
 			expect(result.error.issues[0]?.path).toContain("passwordConfirm");
 		}
+	});
+});
+
+describe("password create / change schemas", () => {
+	it("create: needs a strong, matching password", () => {
+		expect(
+			createPasswordSchema.safeParse({
+				newPassword: "Newpass1",
+				confirmPassword: "Newpass1",
+			}).success
+		).toBe(true);
+		expect(
+			createPasswordSchema.safeParse({
+				newPassword: "abc",
+				confirmPassword: "abc",
+			}).success
+		).toBe(false);
+		expect(
+			createPasswordSchema.safeParse({
+				newPassword: "Newpass1",
+				confirmPassword: "Other111",
+			}).success
+		).toBe(false);
+	});
+
+	it("change: also needs the current password", () => {
+		const base = { newPassword: "Newpass1", confirmPassword: "Newpass1" };
+		expect(
+			changePasswordSchema.safeParse({ ...base, currentPassword: "" }).success
+		).toBe(false);
+		expect(
+			changePasswordSchema.safeParse({ ...base, currentPassword: "Secret1" })
+				.success
+		).toBe(true);
+	});
+
+	it("change: rejects a new password equal to the current one", () => {
+		const result = changePasswordSchema.safeParse({
+			currentPassword: "Secret1",
+			newPassword: "Secret1",
+			confirmPassword: "Secret1",
+		});
+		expect(result.success).toBe(false);
+		if (result.success) return;
+		const issue = result.error.issues.find((i) => i.path[0] === "newPassword");
+		expect(issue?.message).toBe("validation.password.sameAsCurrent");
 	});
 });

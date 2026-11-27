@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { Button } from "../../components/atoms/Button/Button";
+import { PasswordField } from "../../components/molecules/PasswordField/PasswordField";
 import { FormField } from "../../components/molecules/FormField/FormField";
 
 describe("Button", () => {
@@ -59,5 +60,32 @@ describe("FormField", () => {
 			/>
 		);
 		expect(screen.getByText("Required")).toBeInTheDocument();
+	});
+});
+
+describe("PasswordField", () => {
+	it("shows the extra error message in red when provided", () => {
+		render(
+			<PasswordField
+				id="pw"
+				label="Password"
+				value="Secret1"
+				errorMessage="Same as current"
+				onChange={() => {}}
+			/>
+		);
+		expect(screen.getByRole("alert")).toHaveTextContent("Same as current");
+	});
+
+	it("shows no alert without an error message", () => {
+		render(
+			<PasswordField
+				id="pw"
+				label="Password"
+				value="Secret1"
+				onChange={() => {}}
+			/>
+		);
+		expect(screen.queryByRole("alert")).not.toBeInTheDocument();
 	});
 });

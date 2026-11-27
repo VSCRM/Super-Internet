@@ -31,14 +31,37 @@ export interface AppEnv {
 	readonly emailJsServiceId: string | null;
 	readonly emailJsTemplateId: string | null;
 	readonly emailJsPublicKey: string | null;
-	readonly privatBankApiBaseUrl: string | null;
-	readonly privatBankMerchantId: string | null;
+	/** `mock` = test payments (only the `VITE_MOCK_CARDS` are accepted); `real` = real card payments. */
+	readonly paymentMode: PaymentMode;
+	/**
+	 * Test cards (digits only) the checkout form accepts. Taken from
+	 * `VITE_MOCK_CARDS` and only in `mock` payment mode; always empty in `real`
+	 * mode (any valid card is accepted and sent for real processing).
+	 */
+	readonly mockCards: readonly string[];
+}
+
+export type PaymentMode = "mock" | "real";
+
+/** Anything but an explicit "real" is `mock`, so a missing .env never charges real cards. */
+export function readPaymentMode(value: string | undefined): PaymentMode {
+	return (value ?? "").trim().toLowerCase() === "real" ? "real" : "mock";
+}
+
+/** "4111 1111 1111 1111, 5555-5555-5555-4444" -> digits-only card numbers. */
+export function readCardList(value: string | undefined): readonly string[] {
+	return (value ?? "")
+		.split(",")
+		.map((card) => card.replace(/\D/g, ""))
+		.filter((card) => card.length > 0);
 }
 
 function readString(value: string | undefined): string | null {
 	const trimmed = (value ?? "").trim();
 	return trimmed.length > 0 ? trimmed : null;
 }
+
+const paymentMode = readPaymentMode(import.meta.env.VITE_PAYMENT_MODE);
 
 export const env: AppEnv = {
 	backendMode: readBoolean(import.meta.env.VITE_BACKEND_MODE, false),
@@ -51,10 +74,9 @@ export const env: AppEnv = {
 	emailJsServiceId: readString(import.meta.env.VITE_EMAILJS_SERVICE_ID),
 	emailJsTemplateId: readString(import.meta.env.VITE_EMAILJS_TEMPLATE_ID),
 	emailJsPublicKey: readString(import.meta.env.VITE_EMAILJS_PUBLIC_KEY),
-	privatBankApiBaseUrl: readString(
-		import.meta.env.VITE_PRIVATBANK_API_BASE_URL
-	),
-	privatBankMerchantId: readString(import.meta.env.VITE_PRIVATBANK_MERCHANT_ID),
+	paymentMode,
+	mockCards:
+		paymentMode === "mock" ? readCardList(import.meta.env.VITE_MOCK_CARDS) : [],
 };
 
 /** Full URL that starts the Google OAuth2 handshake on the backend. */
@@ -66,8 +88,4 @@ export function isEmailJsConfigured(): boolean {
 	return Boolean(
 		env.emailJsServiceId && env.emailJsTemplateId && env.emailJsPublicKey
 	);
-}
-
-export function isPrivatBankConfigured(): boolean {
-	return Boolean(env.privatBankApiBaseUrl && env.privatBankMerchantId);
 }

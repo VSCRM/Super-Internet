@@ -122,6 +122,7 @@ export function mapUser(dto: UserDto, extras: ClientExtras = {}): AppUser {
 				unreadMessages: dto.unreadMessages,
 				isRecurring: dto.recurring,
 				equipmentStatus: mapEquipmentStatus(dto.equipmentStatus),
+				hasPassword: dto.hasPassword,
 			};
 			return client;
 		}

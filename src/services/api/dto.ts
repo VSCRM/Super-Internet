@@ -22,6 +22,8 @@ export interface UserDto {
 	readonly unreadMessages: number;
 	readonly equipmentStatus: EquipmentStatusDto | null;
 	readonly connectionApproved: boolean;
+	/** `false` for an account created through Google that has not set a password yet. */
+	readonly hasPassword: boolean;
 }
 
 export interface AuthDto {
@@ -82,6 +84,15 @@ export interface PaymentDto {
 	readonly gateway: "MOCK" | "PRIVATBANK";
 	readonly transactionId: string;
 	readonly createdAt: string;
+}
+
+/**
+ * Answer of `POST /payments/privat24/checkout`: where to send the user to pay
+ * (the Privat24 payment page / app link). The balance is credited by the
+ * backend only after the bank confirms the payment.
+ */
+export interface CheckoutSessionDto {
+	readonly paymentUrl: string;
 }
 
 /** Answer of `PATCH /payments/recurring` (the backend's BalanceResponse). */

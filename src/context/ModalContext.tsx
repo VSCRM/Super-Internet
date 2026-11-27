@@ -9,6 +9,10 @@ import type { ReactElement, ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { AddressField } from "../components/molecules/AddressField/AddressField";
 import { isAddressValid } from "../components/molecules/AddressField/addressRequirements";
+import {
+	CheckoutForm,
+	type CheckoutResult,
+} from "../components/organisms/CheckoutForm/CheckoutForm";
 import { useDialogA11y } from "../hooks/useDialogA11y";
 import styles from "./ModalContext.module.scss";
 
@@ -42,7 +46,17 @@ interface PromptAddressModalState {
 	defaultValue: string;
 }
 
+interface CheckoutModalState {
+	type: "checkout";
+	title: string;
+	monthlyPrice: number;
+	tariffLabel: string;
+	allowedCards: readonly string[];
+	realPayment: boolean;
+}
+
 type ModalState =
+	| CheckoutModalState
 	| InfoModalState
 	| ConfirmModalState
 	| PromptModalState
@@ -69,6 +83,17 @@ interface ModalContextValue {
 		message: string,
 		defaultValue?: string
 	) => Promise<string | null>;
+	/**
+	 * Card payment form (brand detection, "Pay via Privat24"). Resolves with the
+	 * amount and the recurring choice only - card data never leaves the form.
+	 */
+	checkout: (
+		title: string,
+		monthlyPrice: number,
+		tariffLabel: string,
+		allowedCards?: readonly string[],
+		realPayment?: boolean
+	) => Promise<CheckoutResult | null>;
 }
 
 const ModalContext = createContext<ModalContextValue | null>(null);
@@ -150,6 +175,25 @@ export function ModalProvider({
 		[open]
 	);
 
+	const checkout = useCallback(
+		(
+			title: string,
+			monthlyPrice: number,
+			tariffLabel: string,
+			allowedCards: readonly string[] = [],
+			realPayment = false
+		) =>
+			open<CheckoutResult | null>({
+				type: "checkout",
+				title,
+				monthlyPrice,
+				tariffLabel,
+				allowedCards,
+				realPayment,
+			}),
+		[open]
+	);
+
 	const isPromptValueValid =
 		modal?.type === "promptAddress" ? isAddressValid(promptValue) : true;
 
@@ -157,7 +201,9 @@ export function ModalProvider({
 	const escapeResult: unknown =
 		modal?.type === "confirm"
 			? false
-			: modal?.type === "prompt" || modal?.type === "promptAddress"
+			: modal?.type === "prompt" ||
+				  modal?.type === "promptAddress" ||
+				  modal?.type === "checkout"
 				? null
 				: undefined;
 	useDialogA11y(dialogRef, () => close(escapeResult), modal !== null);
@@ -166,7 +212,9 @@ export function ModalProvider({
 	const messageId = "modal-message";
 
 	return (
-		<ModalContext.Provider value={{ show, confirm, prompt, promptAddress }}>
+		<ModalContext.Provider
+			value={{ show, confirm, prompt, promptAddress, checkout }}
+		>
 			{children}
 			{modal && (
 				<div
@@ -256,6 +304,25 @@ export function ModalProvider({
 									{t("modal.confirm")}
 								</button>
 							</div>
+						</div>
+					)}
+					{modal.type === "checkout" && (
+						<div
+							ref={dialogRef}
+							role="dialog"
+							aria-modal="true"
+							aria-labelledby={titleId}
+							className={styles["modal-content"]}
+						>
+							<h3 id={titleId}>{modal.title}</h3>
+							<CheckoutForm
+								monthlyPrice={modal.monthlyPrice}
+								tariffLabel={modal.tariffLabel}
+								allowedCards={modal.allowedCards}
+								realPayment={modal.realPayment}
+								onSubmit={(result) => close(result)}
+								onCancel={() => close(null)}
+							/>
 						</div>
 					)}
 					{modal.type === "promptAddress" && (

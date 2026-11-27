@@ -5,6 +5,7 @@ import { useApp } from "../../context/AppContext";
 import type { ClientUser } from "../../types/models";
 import { NavTabs } from "../molecules/NavTabs/NavTabs";
 import { ProfileEditForm } from "../organisms/ProfileEditForm/ProfileEditForm";
+import { PasswordSettings } from "../organisms/PasswordSettings/PasswordSettings";
 import { ClientStatusTab } from "./ClientStatusTab";
 import { ClientContractTab } from "./ClientContractTab";
 import { ClientSupportTab } from "./ClientSupportTab";
@@ -99,6 +100,7 @@ export function ClientDashboard({
 			{tab === "profile" && (
 				<div className={shared["tab-content"]}>
 					<ProfileEditForm client={client} />
+					<PasswordSettings client={client} />
 				</div>
 			)}
 

@@ -1,7 +1,8 @@
 import { useCallback, useState } from "react";
 import type { ReactElement, ReactNode } from "react";
 import type { AppUser } from "../types/models";
-import { isSuccess } from "../shared/lib/result";
+import { useTranslation } from "react-i18next";
+import { appError, failure, isSuccess } from "../shared/lib/result";
 import { getAuthStrategy } from "../services/auth/authStrategyFactory";
 import { getUserRepository } from "../services/repositories/userRepositoryFactory";
 import { getPaymentGateway } from "../services/payments/paymentGatewayFactory";
@@ -29,6 +30,7 @@ export function LocalAppProvider({
 }: {
 	children: ReactNode;
 }): ReactElement {
+	const { t } = useTranslation();
 	const [users, setUsers] = useState<AppUser[]>([]);
 	const [currentUser, setCurrentUser] = useState<AppUser | null>(null);
 
@@ -83,6 +85,19 @@ export function LocalAppProvider({
 
 	const loadThread = useCallback(async () => undefined, []);
 
+	const startPrivat24Payment = useCallback<
+		AppContextValue["startPrivat24Payment"]
+	>(
+		async () => failure(appError("UNSUPPORTED", t("payment.realNeedsBackend"))),
+		[t]
+	);
+
+	const setPassword = useCallback<AppContextValue["setPassword"]>(
+		async () =>
+			failure(appError("UNSUPPORTED", t("errors.notSupportedByBackend"))),
+		[t]
+	);
+
 	const value: AppContextValue = {
 		users,
 		currentUser,
@@ -98,11 +113,13 @@ export function LocalAppProvider({
 		addStaff,
 		deleteStaff,
 		updateProfile,
+		setPassword,
 		selectService,
 		updateContractAddress,
 		updateContractFields,
 		deleteContract,
 		makePayment,
+		startPrivat24Payment,
 		toggleRecurringPayment,
 		approveConnection,
 		setEquipmentStatus,

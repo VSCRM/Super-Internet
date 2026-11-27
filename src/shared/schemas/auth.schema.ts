@@ -148,6 +148,61 @@ export const resetPasswordSchema = z
 		}
 	});
 
+/** The backend rejects passwords longer than this. */
+export const MAX_PASSWORD_LENGTH = 72;
+
+const newPasswordSchema = passwordSchema.refine(
+	(value) => value.length <= MAX_PASSWORD_LENGTH,
+	{ message: "validation.password.tooLong" }
+);
+
+/** Google-only account: there is no current password yet. */
+export const createPasswordSchema = z
+	.object({
+		newPassword: newPasswordSchema,
+		confirmPassword: z.string(),
+	})
+	.superRefine((data, ctx) => {
+		if (data.newPassword !== data.confirmPassword) {
+			ctx.addIssue({
+				code: "custom",
+				message: "validation.password.mismatch",
+				path: ["confirmPassword"],
+			});
+		}
+	});
+
+export type CreatePasswordInput = z.infer<typeof createPasswordSchema>;
+
+/** Account that already has a password: the current one is required. */
+export const changePasswordSchema = z
+	.object({
+		currentPassword: z
+			.string()
+			.min(1, "validation.password.required")
+			.max(MAX_PASSWORD_LENGTH, "validation.password.tooLong"),
+		newPassword: newPasswordSchema,
+		confirmPassword: z.string(),
+	})
+	.superRefine((data, ctx) => {
+		if (data.currentPassword && data.newPassword === data.currentPassword) {
+			ctx.addIssue({
+				code: "custom",
+				message: "validation.password.sameAsCurrent",
+				path: ["newPassword"],
+			});
+		}
+		if (data.newPassword !== data.confirmPassword) {
+			ctx.addIssue({
+				code: "custom",
+				message: "validation.password.mismatch",
+				path: ["confirmPassword"],
+			});
+		}
+	});
+
+export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
+
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
 
 export const staffNameSchema = z

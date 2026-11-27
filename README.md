@@ -3,8 +3,7 @@
 <p align="center">
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-strict-blue?logo=typescript" />
   <img alt="React" src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black" />
-  <img alt="Tests" src="https://img.shields.io/badge/tests-112%20passing-brightgreen" />
-  <img alt="API docs" src="https://img.shields.io/badge/API%20docs-OpenAPI%203.0-85EA2D?logo=swagger&logoColor=black" />
+  <img alt="Tests" src="https://img.shields.io/badge/tests-161%20passing-brightgreen" />
   <a href="./LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-green" /></a>
 </p>
 
@@ -15,8 +14,6 @@
 **🔗 Демо:** [https://vscrm.github.io/Super-Internet/](https://vscrm.github.io/Super-Internet/)
 
 **📦 Репозиторій:** [https://github.com/VSCRM/Super-Internet](https://github.com/VSCRM/Super-Internet)
-
-**📘 API-документація (Swagger/OpenAPI):** [https://vscrm.github.io/Super-Internet/api](https://vscrm.github.io/Super-Internet/api) — інтерактивний Swagger UI, специфікація — [public/api/openapi.yaml](./public/api/openapi.yaml) (докладніше у розділі [Документація API](#документація-api)).
 
 ---
 
@@ -30,11 +27,11 @@
     - [Патерни проєктування](#патерни-проєктування)
     - [Шарування](#шарування)
   - [Швидкий старт](#швидкий-старт)
+    - [Реальна оплата (`VITE_PAYMENT_MODE=real`, лише з бекендом)](#реальна-оплата-vite_payment_modereal-лише-з-бекендом)
   - [Змінні середовища](#змінні-середовища)
   - [Робота з бекендом](#робота-з-бекендом)
   - [Скрипти](#скрипти)
   - [Тестування](#тестування)
-  - [Документація API](#документація-api)
   - [Деплой](#деплой)
   - [Структура проєкту](#структура-проєкту)
   - [Безпека](#безпека)
@@ -53,10 +50,19 @@
 - Вибір послуги (Інтернет / Інтернет + ТБ), договір з незмінним ID обладнання. Із бекендом
   ПІБ і телефон для договору беруться з профілю, а для Google-акаунта (де їх немає) —
   запитуються при оформленні
-- Оплата (Mock: mock-шлюз або PrivatBank-контракт; з бекендом платіж проводить сам бекенд),
-  регулярні платежі
+- Оплата (без бекенду — mock-шлюз; з бекендом справжню оплату через LiqPay проводить сам бекенд),
+  регулярні платежі. Кнопка «Оплатити» відкриває форму картки: сума, номер (автоформат
+  `0000 0000 0000 0000`, перевірка Luhn), термін дії `MM/YY`, CVV, перемикач регулярного
+  платежу, кнопка «Оплатити карткою» та окрема кругла кнопка-іконка Приват24 «Оплатити через додаток» (без введення картки). У режимі `mock` (за замовчуванням) це симуляція: користувач підтверджує платіж, а приймаються лише тестові картки з `VITE_MOCK_CARDS`. У режимі `real` форма без полів картки: кнопка Приват24 просить бекенд створити платіж і переходить на повернуте посилання (див. «Реальна оплата» нижче). Сума одразу підставляється за тарифом клієнта (ціна на місяць), зверху показано назву тарифу, а кнопки «1 / 3 / 6 міс» швидко виставляють суму за відповідну кількість місяців. Тип картки (VISA / Mastercard) визначається
+  автоматично за початком номера. Дані картки лишаються лише в стані форми й не передаються
+  далі — у платіж іде тільки сума та ознака регулярності
 - Чат з підтримкою (з бекендом — живий, оновлюється раз на 5 с, без автовідповіді)
 - Відновлення пароля через email-код: Mock — EmailJS, бекенд — код надсилає (або логує) він сам
+- Пароль у профілі (лише з бекендом): акаунт без пароля (створений через Google) бачить блок
+  «Створити пароль», акаунт з паролем — «Змінити пароль» (поточний + новий + підтвердження).
+  Новий пароль має відповідати вимогам складності й не може збігатися з поточним (помилка
+  червоним). Невірний поточний пароль (400) показується як «Невірний поточний пароль».
+  Бекенд повідомляє про наявність пароля полем `hasPassword`, зміна — `PUT /api/users/me/password`
 
 **Підтримка**
 
@@ -83,18 +89,17 @@
 
 ## Технологічний стек
 
-|                      |                                         |
-| -------------------- | --------------------------------------- |
-| **Мова**             | TypeScript (strict mode, без `any`)     |
-| **UI**               | React 19, SASS Modules (BEM)            |
-| **Валідація**        | Zod                                     |
-| **Локалізація**      | i18next / react-i18next (uk, en)        |
-| **Роутинг**          | React Router                            |
-| **Збірка**           | Vite                                    |
-| **Тести**            | Vitest + Testing Library                |
-| **Лінт**             | ESLint (typescript-eslint, react-hooks) |
-| **HTTP-клієнт**      | axios (Bearer-JWT до Spring-бекенду)    |
-| **API-документація** | OpenAPI 3.0 (`public/api/openapi.yaml`) |
+|                 |                                         |
+| --------------- | --------------------------------------- |
+| **Мова**        | TypeScript (strict mode, без `any`)     |
+| **UI**          | React 19, SASS Modules (BEM)            |
+| **Валідація**   | Zod                                     |
+| **Локалізація** | i18next / react-i18next (uk, en)        |
+| **Роутинг**     | React Router                            |
+| **Збірка**      | Vite                                    |
+| **Тести**       | Vitest + Testing Library                |
+| **Лінт**        | ESLint (typescript-eslint, react-hooks) |
+| **HTTP-клієнт** | axios (Bearer-JWT до Spring-бекенду)    |
 
 ## Архітектура
 
@@ -129,10 +134,14 @@
 ```bash
 git clone https://github.com/VSCRM/Super-Internet.git
 cd Super-Internet
-npm install
+npm ci
 cp .env.example .env
 npm run dev
 ```
+
+`npm ci` ставить залежності точно за `package-lock.json` (відтворювана збірка); `npm install` теж підійде, але може змінити lock-файл. Після встановлення перевірте залежності командою `npm run audit` (`npm audit`) — очікується `found 0 vulnerabilities`.
+
+> Попередження `npm warn install-scripts … @parcel/watcher` (нові версії npm) безпечне: цей пакет потрібен лише для `sass --watch`, а Vite збирає стилі без нього. Дозволяти його не обов'язково.
 
 `.env` опційний — застосунок повністю працює й без нього (Mock-режим за замовчуванням).
 
@@ -146,32 +155,62 @@ npm run dev
 | Адміністратор | admin@super.net   | admin123   |
 | Підтримка     | support@super.net | support123 |
 
+**Логотип Приват24.** Кнопка «Оплатити через додаток» — кругла іконка Приват24 (`public/privat24-logo.png`,
+192×192) з підписом під нею. Якщо файл зникне, замість зображення показується кругле «24».
+
+**Тестові картки** (режим оплати `mock`). Картки не зашиті в код — їх задає `.env`:
+
+```env
+VITE_PAYMENT_MODE=mock
+VITE_MOCK_CARDS=4111111111111111,5555555555554444
+```
+
+| Платіжна система | Номер (з `.env.example`) | Термін дії                  | CVV              |
+| ---------------- | ------------------------ | --------------------------- | ---------------- |
+| VISA             | 4111 1111 1111 1111      | будь-який майбутній `MM/YY` | будь-які 3 цифри |
+| Mastercard       | 5555 5555 5555 4444      | будь-який майбутній `MM/YY` | будь-які 3 цифри |
+
+- `VITE_PAYMENT_MODE=mock` (також значення за замовчуванням, якщо змінної немає): форма приймає
+  лише картки зі списку `VITE_MOCK_CARDS`, інші номери відхиляються з повідомленням (сам список
+  у формі не показується — він лише в `.env` і цьому README). Порожній `VITE_MOCK_CARDS` — приймається будь-яка картка з правильним
+  форматом і контрольною сумою Luhn.
+- `VITE_PAYMENT_MODE=real`: тестові картки **не застосовуються** (`VITE_MOCK_CARDS` ігнорується),
+  а форма не має полів картки — оплата проходить на сторінці Приват24. Див. «Реальна оплата».
+
+### Реальна оплата (`VITE_PAYMENT_MODE=real`, лише з бекендом)
+
+Оплата йде через **LiqPay** (платіжний шлюз ПриватБанку): картку користувач вводить на сторінці
+банку, ні фронтенд, ні бекенд даних картки не бачать. Фронтенд **ніколи** не поповнює баланс сам:
+
+```http
+POST /api/payments/privat24/checkout        (роль CLIENT, Bearer JWT)
+{ "amount": 250.00, "recurring": true }     ← recurring надсилається лише коли true
+
+200 → { "paymentUrl": "https://www.liqpay.ua/api/3/checkout/?data=…&signature=…" }
+```
+
+Фронтенд переходить на `paymentUrl` (приймається лише `https://`, `http://` — тільки localhost).
+Баланс поповнює бекенд, коли банк викличе `POST /api/payments/privat24/callback`
+(перевіряється підпис; повторні виклики нічого не змінюють). Після оплати користувача повертає
+на `FRONTEND_URL`.
+
 ## Змінні середовища
 
 Повний список — у [.env.example](./.env.example). Коротко:
 
-| Змінна                                                     | За замовчуванням        | Призначення                                                                                       |
-| ---------------------------------------------------------- | ----------------------- | ------------------------------------------------------------------------------------------------- |
-| `VITE_BACKEND_MODE`                                        | `false`                 | `true` → бекенд; `false` → локальний Mock                                                         |
-| `VITE_API_BASE_URL`                                        | `/api`                  | Базовий шлях JSON API. `/api` проксіюється Vite на `VITE_BACKEND_ORIGIN` (без CORS)               |
-| `VITE_BACKEND_ORIGIN`                                      | `http://localhost:8080` | Адреса бекенду: ціль проксі та адреса старту входу через Google                                   |
-| `VITE_PRICE_INTERNET` / `VITE_PRICE_INTERNET_TV`           | `250` / `350`           | Ціни тарифів (грн/міс). Бекенд не віддає їх по API — значення мають збігатися з цінами на бекенді |
-| `VITE_EMAILJS_SERVICE_ID` / `_TEMPLATE_ID` / `_PUBLIC_KEY` | —                       | EmailJS для реальних листів відновлення пароля. Без них — фолбек у консоль                        |
-| `VITE_PRIVATBANK_API_BASE_URL` / `_MERCHANT_ID`            | —                       | PrivatBank Acquiring. Без них — `MockPaymentGateway`                                              |
+| Змінна                                                     | За замовчуванням        | Призначення                                                                                                               |
+| ---------------------------------------------------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `VITE_BACKEND_MODE`                                        | `false`                 | `true` → бекенд; `false` → локальний Mock                                                                                 |
+| `VITE_API_BASE_URL`                                        | `/api`                  | Базовий шлях JSON API. `/api` проксіюється Vite на `VITE_BACKEND_ORIGIN` (без CORS)                                       |
+| `VITE_BACKEND_ORIGIN`                                      | `http://localhost:8080` | Адреса бекенду: ціль проксі та адреса старту входу через Google                                                           |
+| `VITE_PRICE_INTERNET` / `VITE_PRICE_INTERNET_TV`           | `250` / `350`           | Ціни тарифів (грн/міс). Бекенд не віддає їх по API — значення мають збігатися з цінами на бекенді                         |
+| `VITE_EMAILJS_SERVICE_ID` / `_TEMPLATE_ID` / `_PUBLIC_KEY` | —                       | EmailJS для реальних листів відновлення пароля. Без них — фолбек у консоль                                                |
+| `VITE_PAYMENT_MODE`                                        | `mock`                  | `mock` — тестова оплата (діють `VITE_MOCK_CARDS`); `real` — реальна оплата через бекенд, тестові картки не застосовуються |
+| `VITE_MOCK_CARDS`                                          | —                       | Тестові картки через кому (лише в режимі `mock`). Порожнє значення — приймати будь-яку валідну                            |
 
 ## Робота з бекендом
 
 З `VITE_BACKEND_MODE=true` фронтенд працює з бекендом замість Mock-шару.
-
-**1. Бекенд.** Запустіть бекенд (`./mvnw spring-boot:run`, PostgreSQL піднімається з
-`compose.yaml`). Важливо для входу через Google:
-
-- `FRONTEND_URL=http://localhost:5173/Super-Internet` — **з префіксом `/Super-Internet`**:
-  бекенд повертає браузер на `FRONTEND_URL + /oauth-callback`;
-- у Google Cloud Console дозволений redirect URI `http://localhost:8080/login/oauth2/code/google`.
-
-**2. Фронтенд.** `cp .env.example .env` (там `VITE_BACKEND_MODE=true`), `npm install`,
-`npm run dev`, відкрити `http://localhost:5173/Super-Internet/`.
 
 **Як це влаштовано**
 
@@ -189,27 +228,28 @@ npm run dev
 - Дані клієнта складаються з кількох ендпоінтів (`/auth/me`, `/contracts/me`, `/chat/messages`);
   для підтримки й адміна — з `/users`, `/contracts`, `/chat/conversations`. Стан оновлюється
   опитуванням раз на 5 с (баланс, схвалення, нові повідомлення).
-- У режимі бекенду немає автовідповіді в чаті; платежі проводить бекенд (свій шлюз).
+- У режимі бекенду немає автовідповіді в чаті; платежі проводить бекенд (свій шлюз); реальна оплата Приват24 — `POST /api/payments/privat24/checkout`.
 
 ## Скрипти
 
-| Команда                 | Що робить                                        |
-| ----------------------- | ------------------------------------------------ |
-| `npm run dev`           | Дев-сервер з hot reload                          |
-| `npm run build`         | Продакшн-збірка в `dist/`                        |
-| `npm run preview`       | Локальний перегляд збірки                        |
-| `npm run lint`          | ESLint                                           |
-| `npm run type-check`    | `tsc --noEmit` (strict)                          |
-| `npm run format`        | Prettier — відформатувати всі файли (з табами)   |
-| `npm run format:check`  | Prettier — перевірити без змін                   |
-| `npm run test`          | Vitest, один прогін                              |
-| `npm run test:watch`    | Vitest у watch-режимі                            |
-| `npm run test:coverage` | Покриття тестами                                 |
-| `npm run deploy`        | Збірка + публікація на GitHub Pages (`gh-pages`) |
+| Команда                 | Що робить                                                 |
+| ----------------------- | --------------------------------------------------------- |
+| `npm run dev`           | Дев-сервер з hot reload                                   |
+| `npm run build`         | Продакшн-збірка в `dist/`                                 |
+| `npm run preview`       | Локальний перегляд збірки                                 |
+| `npm run lint`          | ESLint                                                    |
+| `npm run type-check`    | `tsc --noEmit` (strict)                                   |
+| `npm run format`        | Prettier — відформатувати всі файли (з табами)            |
+| `npm run format:check`  | Prettier — перевірити без змін                            |
+| `npm run test`          | Vitest, один прогін                                       |
+| `npm run test:watch`    | Vitest у watch-режимі                                     |
+| `npm run test:coverage` | Покриття тестами                                          |
+| `npm run audit`         | `npm audit` — перевірка залежностей на відомі вразливості |
+| `npm run deploy`        | Збірка + публікація на GitHub Pages (`gh-pages`)          |
 
 ## Тестування
 
-**112 тестів** (Vitest + Testing Library), зосереджені на бізнес-логічному шарі й
+**161 тест** (Vitest + Testing Library), зосереджені на бізнес-логічному шарі й
 критичних UI-регресіях:
 
 - Сервісний шар: auth-стратегії, відновлення пароля з лок-аутом, платіжний шлюз,
@@ -217,6 +257,7 @@ npm run dev
 - Інтеграція з бекендом (HTTP підмінюється на рівні axios-адаптера): Bearer-авторизація,
   форми запитів до всіх ендпоінтів, мапінг DTO та помилок, склеювання списків для персоналу,
   відновлення пароля, колбек Google та кнопка входу
+- Форма оплати: оплата в додатку Приват24, кругла кнопка Приват24, обмеження тестовими картками лише в режимі `mock`, читання `.env`, суми-шаблони за тарифом, визначення VISA/Mastercard, маски номера й терміну, Luhn, перевірка терміну дії, що з форми виходять лише сума й регулярність
 - Компонентні регресії: наприклад `Header.test.tsx` — перемикання мови в лендинг-шапці
   реально змінює текст (і перемикається назад), а сам перемикач не сидить усередині
   ряду навігації — саме ця пара речей одного разу ламалась, тест написаний, щоб це не
@@ -229,30 +270,6 @@ npm run test:coverage
 
 UI-шар поза цими сценаріями (окремі форми, панелі адмінки) покритий тестами частково —
 свідомий компроміс.
-
-## Документація API
-
-`public/api/openapi.yaml` — специфікація OpenAPI 3.0, написана на ранньому етапі як чернетка
-контракту (cookie-сесія). **Вона застаріла:** бекенд використовує Bearer-JWT, а його
-актуальний контракт — у Swagger бекенду (`SWAGGER_ENABLED=true`, `/swagger-ui.html`).
-Файл лишено як історичну довідку.
-
-Файли лежать у `public/api/` (не в окремій папці `docs/`), тому Vite копіює їх у збірку
-як є, і після `npm run deploy` вони автоматично публікуються на GitHub Pages разом з
-рештою застосунку — за адресою:
-
-**🔗 [https://vscrm.github.io/Super-Internet/api](https://vscrm.github.io/Super-Internet/api)**
-
-Переглянути локально (під час розробки):
-
-```bash
-npm run dev
-```
-
-і відкрити `http://localhost:5173/Super-Internet/api/` (порт може відрізнятись —
-дивіться, що виведе Vite в консоль). Просто відкрити `public/api/index.html`
-подвійним кліком не спрацює в деяких браузерах через CORS-обмеження на `fetch()`
-локального файлу — потрібен сервер (звідси й `npm run dev`, а не файл напряму).
 
 ## Деплой
 
@@ -271,14 +288,15 @@ npm run deploy
 ```
 super-internet/
 ├── public/
-│   ├── api/
-│   │   ├── index.html
-│   │   └── openapi.yaml
-│   └── Logo.png
+│   ├── Logo.png
+│   └── privat24-logo.png
 ├── src/
 │   ├── __tests__/
 │   │   ├── components/
+│   │   │   ├── CheckoutForm.test.tsx
 │   │   │   ├── GoogleSignInButton.test.tsx
+│   │   │   ├── Privat24Button.test.tsx
+│   │   │   ├── usePaymentAction.test.tsx
 │   │   │   ├── Header.test.tsx
 │   │   │   └── atoms.test.tsx
 │   │   ├── api/
@@ -297,6 +315,7 @@ super-internet/
 │   │   ├── schemas/
 │   │   │   ├── addStaff.test.ts
 │   │   │   ├── auth.schema.test.ts
+│   │   │   ├── payment.schema.test.ts
 │   │   │   └── profile.schema.test.ts
 │   │   ├── services/
 │   │   │   ├── LocalAuthStrategy.test.ts
@@ -305,7 +324,10 @@ super-internet/
 │   │   │   ├── PasswordRecoveryService.test.ts
 │   │   │   └── chatMessagePersistence.test.ts
 │   │   └── shared/
+│   │       ├── card.test.ts
+│   │       ├── env.test.ts
 │   │       ├── passwordHasher.test.ts
+│   │       ├── paymentUrl.test.ts
 │   │       ├── rateLimiter.test.ts
 │   │       ├── result.test.ts
 │   │       └── sanitize.test.ts
@@ -400,6 +422,9 @@ super-internet/
 │   │   │   ├── Pagination/
 │   │   │   │   ├── Pagination.module.scss
 │   │   │   │   └── Pagination.tsx
+│   │   │   ├── Privat24Button/
+│   │   │   │   ├── Privat24Button.module.scss
+│   │   │   │   └── Privat24Button.tsx
 │   │   │   ├── PasswordField/
 │   │   │   │   ├── PasswordField.module.scss
 │   │   │   │   └── PasswordField.tsx
@@ -409,6 +434,11 @@ super-internet/
 │   │   │   ├── AuthScreen/
 │   │   │   │   ├── AuthScreen.module.scss
 │   │   │   │   └── AuthScreen.tsx
+│   │   │   ├── CheckoutForm/
+│   │   │   │   ├── CheckoutForm.module.scss
+│   │   │   │   └── CheckoutForm.tsx
+│   │   │   ├── PasswordSettings/
+│   │   │   │   └── PasswordSettings.tsx
 │   │   │   ├── PasswordRecoveryPanel/
 │   │   │   │   ├── PasswordRecoveryPanel.module.scss
 │   │   │   │   └── PasswordRecoveryPanel.tsx
@@ -477,7 +507,6 @@ super-internet/
 │   │   ├── payments/
 │   │   │   ├── MockPaymentGateway.ts
 │   │   │   ├── PaymentGateway.ts
-│   │   │   ├── PrivatBankPaymentGateway.ts
 │   │   │   └── paymentGatewayFactory.ts
 │   │   └── repositories/
 │   │       ├── LocalUserRepository.ts
@@ -487,8 +516,10 @@ super-internet/
 │   │   ├── config/
 │   │   │   └── env.ts
 │   │   ├── lib/
+│   │   │   ├── card.ts
 │   │   │   ├── id.ts
 │   │   │   ├── passwordHasher.ts
+│   │   │   ├── paymentUrl.ts
 │   │   │   ├── rateLimiter.ts
 │   │   │   ├── result.ts
 │   │   │   ├── sanitize.ts
@@ -534,7 +565,7 @@ super-internet/
 - Брутфорс: лок-аут на 60с після 5 невдалих спроб входу чи введення коду відновлення
   (client-side speed bump для Mock-режиму; **бекенд має форсувати це незалежно**)
 - Санітизація всіх текстових полів (`shared/lib/sanitize.ts`) перед збереженням
-- `npm audit`: 0 відомих вразливостей на момент останньої перевірки
+- Залежності перевіряються командою `npm run audit` (`npm audit`); на 26.11.2026 — 0 вразливостей (після `npm audit fix`); нові advisories з'являються постійно, тому запускайте її перед релізом
 
 ## Продуктивність
 
