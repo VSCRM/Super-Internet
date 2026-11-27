@@ -1,0 +1,1 @@
+var e=`si_access_token`;function t(){try{return window.localStorage.getItem(e)}catch{return null}}function n(t){try{window.localStorage.setItem(e,t)}catch{}}function r(){try{window.localStorage.removeItem(e)}catch{}}export{t as n,n as r,r as t};
